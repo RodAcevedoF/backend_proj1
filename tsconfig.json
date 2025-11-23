@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ESNext"],
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "strict": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@test/*": ["tests/*"],
+      "@root/*": ["./*"]
+    }
+  },
+  "include": ["src", "tests"],
+  "exclude": ["node_modules"]
+}
