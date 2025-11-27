@@ -4,5 +4,7 @@ export interface IArticleRepository {
   findById(id: string): Promise<Article | null>;
   findByWorkspace(workspaceId: string): Promise<Article[]>;
   save(article: Article): Promise<void>;
+  updateById(id: string, article: Partial<Article>): Promise<void>;
   bulkInsert(articles: Article[]): Promise<void>;
+  deleteById(id: string): Promise<void>;
 }

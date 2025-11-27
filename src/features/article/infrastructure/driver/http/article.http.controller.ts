@@ -1,12 +1,24 @@
 import { IArticleService } from '@/features/article/app/IArticle.service';
+import { CreateArticleDTO } from '@/features/article/app/dtos/create-article.dto';
 
 export class ArticleController {
   constructor(private service: IArticleService) {}
 
   create = async (req: any, res: any) => {
     try {
-      const { title, content } = req.body;
-      const article = await this.service.create({ title, content });
+      const { title, content, workspaceId, tags } =
+        req.body as CreateArticleDTO;
+
+      if (!workspaceId) {
+        return res.status(400).json({ error: 'workspaceId is required' });
+      }
+
+      const article = await this.service.create({
+        title,
+        content,
+        workspaceId,
+        tags,
+      });
       res.status(201).json(article);
     } catch (err: any) {
       res.status(400).json({ error: err.message });

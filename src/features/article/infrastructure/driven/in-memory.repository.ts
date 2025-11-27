@@ -1,5 +1,5 @@
 import { IArticleRepository } from '@/features/article/domain/ports/outbound/IArticle.port';
-import { Article } from '../../domain/Article';
+import { Article, type ArticleProps } from '../../domain/Article';
 
 export class InMemoryArticleRepository implements IArticleRepository {
   private store = new Map<string, Article>();
@@ -26,5 +26,27 @@ export class InMemoryArticleRepository implements IArticleRepository {
     for (const article of articles) {
       this.store.set(article.id, article);
     }
+  }
+
+  async deleteById(id: string): Promise<void> {
+    this.store.delete(id);
+  }
+
+  async updateById(
+    id: string,
+    updatedFields: Partial<ArticleProps>
+  ): Promise<void> {
+    const article = this.store.get(id);
+    if (!article) return;
+
+    const base = article.toPrimitives() as ArticleProps;
+    const merged: ArticleProps = {
+      ...base,
+      ...updatedFields,
+      updatedAt: new Date(),
+    };
+
+    const updatedArticle = new Article(merged);
+    this.store.set(id, updatedArticle);
   }
 }
