@@ -1,5 +1,5 @@
-import { IArticleRepository } from '@/features/article/domain/ports/outbound/IArticle.port';
-import { Article, type ArticleProps } from '../../domain/Article';
+import { IArticleRepository } from '@/features/article/domain/ports/outbound/iarticle.repository';
+import { Article, type ArticleProps } from '@/features/article/domain/Article';
 
 export class InMemoryArticleRepository implements IArticleRepository {
   private store = new Map<string, Article>();

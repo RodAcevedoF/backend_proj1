@@ -1,8 +1,8 @@
-import { IArticleService } from '@/features/article/app/IArticle.service';
+import { IArticleService } from '@/features/article/app/iarticle.service';
 import { CreateArticleDTO } from '@/features/article/app/dtos/create-article.dto';
 
 export class ArticleController {
-  constructor(private service: IArticleService) {}
+  constructor(private readonly service: IArticleService) {}
 
   create = async (req: any, res: any) => {
     try {

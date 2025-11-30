@@ -1,6 +1,7 @@
 export interface ArticleResponseDTO {
   id: string;
-  workspaceId: string;
+  workspaceId?: string;
+  userId?: string;
   title: string;
   content: string;
   tags: string[];

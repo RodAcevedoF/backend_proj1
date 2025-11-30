@@ -1,6 +1,7 @@
 export interface CreateArticleDTO {
   title: string;
   content: string;
-  workspaceId: string;
+  workspaceId?: string;
+  userId?: string;
   tags?: string[];
 }
