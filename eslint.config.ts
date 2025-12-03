@@ -4,7 +4,7 @@ import typescriptParser from '@typescript-eslint/parser';
 export default [
   {
     files: ['src/**/*.ts'],
-    ignores: ['node_modules', 'dist', 'bun.lockb'],
+    ignores: ['node_modules', 'dist', 'pnpm-lock.yaml'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
