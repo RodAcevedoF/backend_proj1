@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/IWorkspaceService';
+import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/iworkspace.service';
 import { EntityId } from '@/core/domain/EntityId';
 import {
   CreateWorkspaceDto,

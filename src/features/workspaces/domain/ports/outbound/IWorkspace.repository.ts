@@ -1,5 +1,5 @@
-import { Workspace } from '../../Workspace';
-import { EntityId } from '../../../../../core/domain/EntityId';
+import { Workspace } from '@/features/workspaces/domain/workspace';
+import { EntityId } from '@/core/domain/EntityId';
 
 /**
  * Workspace Repository Port (Outbound)

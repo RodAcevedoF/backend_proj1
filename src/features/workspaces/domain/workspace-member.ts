@@ -1,18 +1,15 @@
-import { ValueObject } from '../../../core/domain/ValueObject';
-import { EntityId } from '../../../core/domain/EntityId';
+import { ValueObject } from '@/core/domain/ValueObject';
+import { EntityId } from '@/core/domain/EntityId';
 import {
   Role,
   canEdit as roleCanEdit,
   canManage as roleCanManage,
   isOwner as roleIsOwner,
-} from '../../../core/domain/Role';
-
-/** @deprecated Use Role from @/core/domain instead */
-export type WorkspaceMemberRole = Role;
+} from '@/core/domain/Role';
 
 interface WorkspaceMemberProps {
   userId: EntityId;
-  role: WorkspaceMemberRole;
+  role: Role;
   joinedAt: Date;
   invitedBy?: EntityId;
 }
@@ -28,7 +25,7 @@ export class WorkspaceMember extends ValueObject<WorkspaceMemberProps> {
 
   static create(
     userId: EntityId,
-    role: WorkspaceMemberRole,
+    role: Role,
     invitedBy?: EntityId
   ): WorkspaceMember {
     return new WorkspaceMember({
@@ -41,7 +38,7 @@ export class WorkspaceMember extends ValueObject<WorkspaceMemberProps> {
 
   static fromPrimitives(data: {
     userId: string;
-    role: WorkspaceMemberRole;
+    role: Role;
     joinedAt: Date;
     invitedBy?: string;
   }): WorkspaceMember {
@@ -57,7 +54,7 @@ export class WorkspaceMember extends ValueObject<WorkspaceMemberProps> {
     return this.props.userId;
   }
 
-  get role(): WorkspaceMemberRole {
+  get role(): Role {
     return this.props.role;
   }
 
@@ -93,7 +90,7 @@ export class WorkspaceMember extends ValueObject<WorkspaceMemberProps> {
   /**
    * Change member role
    */
-  withRole(newRole: WorkspaceMemberRole): WorkspaceMember {
+  withRole(newRole: Role): WorkspaceMember {
     return new WorkspaceMember({
       ...this.props,
       role: newRole,

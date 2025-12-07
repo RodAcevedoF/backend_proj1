@@ -1,6 +1,6 @@
-import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/IWorkspace.repository';
+import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/iworkspace.repository';
 import { IUserService } from '@/features/users/domain/ports/inbound/iuser.service';
-import { Workspace } from '@/features/workspaces/domain/Workspace';
+import { Workspace } from '@/features/workspaces/domain/workspace';
 import { EntityId, Result } from '@/core/domain';
 import { CreateWorkspaceDto } from '@/features/workspaces/app/dtos/workspace.dto';
 

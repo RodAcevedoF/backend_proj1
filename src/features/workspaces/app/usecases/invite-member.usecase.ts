@@ -1,4 +1,4 @@
-import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/IWorkspace.repository';
+import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/iworkspace.repository';
 import { IUserService } from '@/features/users/domain/ports/inbound/iuser.service';
 import { EntityId, Email, Result } from '@/core/domain';
 import { InviteMemberDto } from '@/features/workspaces/app/dtos/workspace.dto';

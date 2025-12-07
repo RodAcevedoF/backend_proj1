@@ -1,7 +1,7 @@
-import { Workspace } from '../../../domain/Workspace';
-import { EntityId } from '../../../../../core/domain/EntityId';
-import { WorkspaceMember } from '../../../domain/WorkspaceMember';
-import { WorkspaceSettings } from '../../../domain/WorkspaceSettings';
+import { EntityId } from '@/core/domain';
+import { Workspace } from '@/features/workspaces/domain/workspace';
+import { WorkspaceMember } from '@/features/workspaces/domain/workspace-member';
+import { WorkspaceSettings } from '@/features/workspaces/domain/workspace-settings';
 
 interface WorkspaceDocument {
   _id: string;

@@ -1,5 +1,5 @@
-import { BaseDomainEvent } from '../../../core/domain/DomainEvent';
-import { EntityId } from '../../../core/domain/EntityId';
+import { BaseDomainEvent } from '@/core/domain/DomainEvent';
+import { EntityId } from '@/core/domain/EntityId';
 
 /**
  * Workspace Created Event

@@ -1,8 +1,8 @@
-import { IWorkspaceRepository } from '../../../domain/ports/outbound/IWorkspace.repository';
-import { Workspace } from '../../../domain/Workspace';
-import { EntityId } from '../../../../../core/domain/EntityId';
-import { WorkspaceModel } from './WorkspaceSchema';
-import { WorkspaceMapper } from './WorkspaceMapper';
+import { WorkspaceModel } from './workspace.schema';
+import { WorkspaceMapper } from './workspace.mapper';
+import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/iworkspace.repository';
+import { EntityId } from '@/core/domain';
+import { Workspace } from '@/features/workspaces/domain/workspace';
 
 /**
  * MongoDB implementation of Workspace Repository

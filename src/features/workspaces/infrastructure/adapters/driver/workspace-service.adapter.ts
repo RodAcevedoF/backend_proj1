@@ -1,6 +1,6 @@
 import { Result, EntityId } from '@/core/domain';
-import { Workspace } from '@/features/workspaces/domain/Workspace';
-import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/IWorkspaceService';
+import { Workspace } from '@/features/workspaces/domain/workspace';
+import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/iworkspace.service';
 import { CreateWorkspaceUseCase } from '@/features/workspaces/app/usecases/create-workspace.usecase';
 import { InviteMemberUseCase } from '@/features/workspaces/app/usecases/invite-member.usecase';
 import {

@@ -1,7 +1,7 @@
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
-import { EntityId } from '../../../core/domain/EntityId';
-import { WorkspaceMember, WorkspaceMemberRole } from './WorkspaceMember';
-import { WorkspaceSettings } from './WorkspaceSettings';
+import { AggregateRoot } from '@/core/domain/AggregateRoot';
+import { EntityId } from '@/core/domain/EntityId';
+import { WorkspaceMember } from './workspace-member';
+import { WorkspaceSettings } from './workspace-settings';
 import {
   WorkspaceCreatedEvent,
   MemberAddedEvent,
@@ -10,7 +10,8 @@ import {
   WorkspaceUpdatedEvent,
   WorkspaceSettingsUpdatedEvent,
   OwnershipTransferredEvent,
-} from './WorkspaceEvents';
+} from './workspace-events';
+import { Role } from '@/core/domain';
 
 export interface WorkspaceProps {
   name: string;
@@ -138,11 +139,7 @@ export class Workspace extends AggregateRoot {
   /**
    * Add a member to the workspace
    */
-  addMember(
-    userId: EntityId,
-    role: WorkspaceMemberRole,
-    invitedBy?: EntityId
-  ): void {
+  addMember(userId: EntityId, role: Role, invitedBy?: EntityId): void {
     // Check if already a member
     if (this.isMember(userId)) {
       throw new Error('User is already a member of this workspace');
@@ -194,7 +191,7 @@ export class Workspace extends AggregateRoot {
    */
   changeMemberRole(
     userId: EntityId,
-    newRole: WorkspaceMemberRole,
+    newRole: Role,
     changedBy?: EntityId
   ): void {
     const index = this.props.members.findIndex((m) => m.userId.equals(userId));
