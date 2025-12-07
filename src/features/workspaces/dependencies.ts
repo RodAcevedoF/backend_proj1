@@ -1,10 +1,10 @@
 import { IUserService } from '@/features/users/domain/ports/inbound/iuser.service';
 import { CreateWorkspaceUseCase } from './app/usecases/create-workspace.usecase';
 import { InviteMemberUseCase } from './app/usecases/invite-member.usecase';
-import { MongoWorkspaceRepository } from './infrastructure/adapters/driven/MongoWorkspaceRepository';
+import { MongoWorkspaceRepository } from './infrastructure/adapters/driven/mongo-workspace.repository';
 import { WorkspaceServiceAdapter } from './infrastructure/adapters/driver/workspace-service.adapter';
 import { WorkspaceController } from './infrastructure/adapters/driver/http/workspace.controller';
-import { IWorkspaceService } from './domain/ports/inbound/IWorkspaceService';
+import { IWorkspaceService } from './domain/ports/inbound/iworkspace.service';
 
 export type WorkspacesDependencies = {
   workspaceRepository: MongoWorkspaceRepository;
@@ -18,8 +18,12 @@ export type WorkspacesExternalDeps = {
 
 // Stub user service for when we need workspace service before users are initialized
 const stubUserService: IUserService = {
-  register: async () => { throw new Error('Not implemented'); },
-  login: async () => { throw new Error('Not implemented'); },
+  register: async () => {
+    throw new Error('Not implemented');
+  },
+  login: async () => {
+    throw new Error('Not implemented');
+  },
   findById: async () => null,
   findByEmail: async () => null,
   save: async () => {},

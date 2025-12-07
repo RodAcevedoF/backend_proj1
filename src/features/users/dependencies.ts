@@ -2,7 +2,7 @@ import { IPasswordHasher } from '@/core/domain/ports/IPasswordHasher';
 import { ITokenService } from '@/core/domain/ports/ITokenService';
 import { IEmailService } from '@/core/domain/ports/IEmailService';
 import { IOAuthProvider } from '@/core/domain/ports/IOAuthProvider';
-import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/IWorkspaceService';
+import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/iworkspace.service';
 import { RegisterUserUseCase } from './app/usecases/register-user.usecase';
 import { LoginUserUseCase } from './app/usecases/login-user.usecase';
 import { VerifyEmailUseCase } from './app/usecases/verify-email.usecase';
@@ -11,7 +11,7 @@ import { GoogleAuthUseCase } from './app/usecases/google-auth.usecase';
 import { RequestPasswordResetUseCase } from './app/usecases/request-password-reset.usecase';
 import { ResetPasswordUseCase } from './app/usecases/reset-password.usecase';
 import { UserServiceAdapter } from './infrastructure/adapters/driver/user-service.adapter';
-import { MongoUserRepository } from './infrastructure/adapters/driven/persistence/MongoUserRepository';
+import { MongoUserRepository } from './infrastructure/adapters/driven/persistence/mongo.repository';
 import { AuthController } from './infrastructure/adapters/driver/http/auth.controller';
 import { IUserService } from './domain/ports/inbound/iuser.service';
 

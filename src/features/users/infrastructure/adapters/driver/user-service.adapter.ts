@@ -1,7 +1,7 @@
 import { EntityId, Email, Result } from '@/core/domain';
 import { User } from '@/features/users/domain/User';
 import { IUserService } from '@/features/users/domain/ports/inbound/iuser.service';
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { RegisterUserUseCase } from '@/features/users/app/usecases/register-user.usecase';
 import { LoginUserUseCase } from '@/features/users/app/usecases/login-user.usecase';
 import {

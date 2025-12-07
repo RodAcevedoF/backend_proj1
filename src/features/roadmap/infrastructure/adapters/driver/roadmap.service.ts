@@ -1,5 +1,5 @@
 import { Result } from '@/core/domain';
-import { IRoadmapService } from '@/features/roadmap/domain/ports/inbound/IRoadmapService';
+import { IRoadmapService } from '@/features/roadmap/domain/ports/inbound/Iroadmap.service';
 import { CreateRoadmapUseCase } from '@/features/roadmap/app/usecases/create-roadmap.usecase';
 import { GenerateAIRoadmapUseCase } from '@/features/roadmap/app/usecases/generate-ai-roadmap.usecase';
 import { GetRoadmapUseCase } from '@/features/roadmap/app/usecases/get-roadmap.usecase';
@@ -56,7 +56,10 @@ export class RoadmapServiceAdapter implements IRoadmapService {
     workspaceId: string,
     onlyPublished?: boolean
   ): Promise<Result<RoadmapResponseDto[]>> {
-    return this.listWorkspaceRoadmapsUseCase.execute(workspaceId, onlyPublished);
+    return this.listWorkspaceRoadmapsUseCase.execute(
+      workspaceId,
+      onlyPublished
+    );
   }
 
   async updateProgress(

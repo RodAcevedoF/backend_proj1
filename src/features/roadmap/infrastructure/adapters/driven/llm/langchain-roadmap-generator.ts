@@ -1,8 +1,8 @@
 import { ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
-import { IAIRoadmapGenerator } from '../../../../domain/ports/outbound/ia-iroadmap-generator';
-import { RoadmapStep } from '../../../../domain/value-objects/RoadmapStep';
-import { LearningResource } from '../../../../domain/value-objects/LearningResource';
+import { IAIRoadmapGenerator } from '@/features/roadmap/domain/ports/outbound/ia-iroadmap-generator';
+import { RoadmapStep } from '@/features/roadmap/domain/value-objects/roadmap-step';
+import { LearningResource } from '@/features/roadmap/domain/value-objects/learning-resource';
 
 /**
  * LangChain-based AI Roadmap Generator

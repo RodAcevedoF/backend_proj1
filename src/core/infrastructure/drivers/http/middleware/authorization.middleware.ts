@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/IWorkspace.repository';
+import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/iworkspace.repository';
 import { EntityId } from '@/core/domain/EntityId';
 import { Role, hasMinimumRole } from '@/core/domain/Role';
 

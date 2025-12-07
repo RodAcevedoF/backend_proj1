@@ -1,4 +1,4 @@
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { IPasswordHasher } from '@/core/domain/ports/IPasswordHasher';
 import { Result } from '@/core/domain';
 import { ResetPasswordDTO } from '../dtos/auth.dto';

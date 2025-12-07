@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto';
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { IEmailService } from '@/core/domain/ports/IEmailService';
 import { Email, Result } from '@/core/domain';
 

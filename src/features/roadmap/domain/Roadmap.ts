@@ -1,7 +1,7 @@
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
-import { EntityId } from '../../../core/domain/EntityId';
-import { RoadmapStep } from './value-objects/RoadmapStep';
-import { Progress } from './value-objects/Progress';
+import { AggregateRoot } from '@/core/domain/AggregateRoot';
+import { EntityId } from '@/core/domain/EntityId';
+import { RoadmapStep } from './value-objects/roadmap-step';
+import { Progress } from './value-objects/progress';
 
 /**
  * Roadmap Aggregate Root

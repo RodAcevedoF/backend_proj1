@@ -1,4 +1,4 @@
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { IOAuthProvider } from '@/core/domain/ports/IOAuthProvider';
 import { ITokenService } from '@/core/domain/ports/ITokenService';
 import { Email, Result } from '@/core/domain';

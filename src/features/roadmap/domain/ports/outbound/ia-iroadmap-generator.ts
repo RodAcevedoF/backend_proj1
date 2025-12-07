@@ -1,4 +1,4 @@
-import { RoadmapStep } from '../../value-objects/RoadmapStep';
+import { RoadmapStep } from '@/features/roadmap/domain/value-objects/roadmap-step';
 
 /**
  * AI Roadmap Generator Port (Outbound)

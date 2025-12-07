@@ -1,4 +1,4 @@
-import { LearningResource } from './LearningResource';
+import { LearningResource } from './learning-resource';
 
 /**
  * Roadmap Step Value Object

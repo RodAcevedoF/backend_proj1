@@ -3,7 +3,7 @@ import {
   AuthResponseDto,
   UserResponseDto,
 } from '@/features/users/app/dtos/user.dto';
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { IPasswordHasher } from '@/core/domain/ports/IPasswordHasher';
 import { ITokenService } from '@/core/domain/ports/ITokenService';
 import { Email, Result } from '@/core/domain';

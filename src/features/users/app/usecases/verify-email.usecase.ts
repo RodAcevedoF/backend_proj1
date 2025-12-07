@@ -1,4 +1,4 @@
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { Result } from '@/core/domain';
 import { VerifyEmailDTO } from '../dtos/auth.dto';
 

@@ -1,9 +1,9 @@
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { User } from '@/features/users/domain/User';
 import { EntityId } from '@/core/domain/EntityId';
 import { Email } from '@/core/domain/Email';
-import { UserModel } from './UserSchema';
-import { UserMapper } from './UserMapper';
+import { UserModel } from './user.schema';
+import { UserMapper } from './user.mapper';
 
 /**
  * MongoDB implementation of User Repository

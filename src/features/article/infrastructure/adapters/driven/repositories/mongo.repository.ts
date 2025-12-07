@@ -3,8 +3,8 @@ import {
   ArticleQueryFilters,
   PaginationOptions,
   PaginatedResult,
-} from '../../../../domain/ports/outbound/iarticle.repository';
-import { Article, type ArticleProps } from '../../../../domain/Article';
+} from '@/features/article/domain/ports/outbound/iarticle.repository';
+import { Article } from '@/features/article/domain/Article';
 import { ArticleModel } from './mongo/schema';
 import { toDomain, toPersistence } from './mongo/mappers';
 

@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
-import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/IWorkspaceService';
-import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
+import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/iworkspace.service';
+import { IUserRepository } from '@/features/users/domain/ports/outbound/iuser.repository';
 import { IEmailService } from '@/core/domain/ports/IEmailService';
 import { RegisterUserDto } from '@/features/users/app/dtos/user.dto';
 import { IPasswordHasher } from '@/core/domain/ports/IPasswordHasher';

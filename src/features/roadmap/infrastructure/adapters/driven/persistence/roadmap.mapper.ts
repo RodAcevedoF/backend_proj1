@@ -1,8 +1,8 @@
-import { Roadmap } from '../../../../domain/Roadmap';
-import { EntityId } from '../../../../../../core/domain/EntityId';
-import { RoadmapStep } from '../../../../domain/value-objects/RoadmapStep';
-import { LearningResource } from '../../../../domain/value-objects/LearningResource';
-import { Progress } from '../../../../domain/value-objects/Progress';
+import { EntityId } from '@/core/domain';
+import { Roadmap } from '@/features/roadmap/domain/Roadmap';
+import { LearningResource } from '@/features/roadmap/domain/value-objects/learning-resource';
+import { Progress } from '@/features/roadmap/domain/value-objects/progress';
+import { RoadmapStep } from '@/features/roadmap/domain/value-objects/roadmap-step';
 
 /**
  * Roadmap Mapper

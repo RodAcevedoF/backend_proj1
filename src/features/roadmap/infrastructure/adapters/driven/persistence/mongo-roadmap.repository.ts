@@ -1,7 +1,7 @@
-import { IRoadmapRepository } from '../../../../domain/ports/outbound/iroadmap.repository';
-import { Roadmap } from '../../../../domain/Roadmap';
-import { RoadmapModel } from './RoadmapSchema';
-import { RoadmapMapper } from './RoadmapMapper';
+import { RoadmapModel } from './roadmap.schema';
+import { RoadmapMapper } from './roadmap.mapper';
+import { Roadmap } from '@/features/roadmap/domain/Roadmap';
+import { IRoadmapRepository } from '@/features/roadmap/domain/ports/outbound/iroadmap.repository';
 
 /**
  * MongoDB Roadmap Repository

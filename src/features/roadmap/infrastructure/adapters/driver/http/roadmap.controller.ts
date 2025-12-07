@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IRoadmapService } from '@/features/roadmap/domain/ports/inbound/IRoadmapService';
+import { IRoadmapService } from '@/features/roadmap/domain/ports/inbound/Iroadmap.service';
 
 /**
  * Roadmap HTTP Controller

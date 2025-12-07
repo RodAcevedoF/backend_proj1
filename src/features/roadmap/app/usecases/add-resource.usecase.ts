@@ -1,6 +1,6 @@
-import { Result } from '../../../../core/domain/Result';
-import { IRoadmapRepository } from '../../domain/ports/outbound/iroadmap.repository';
-import { LearningResource } from '../../domain/value-objects/LearningResource';
+import { Result } from '@/core/domain/Result';
+import { IRoadmapRepository } from '@/features/roadmap/domain/ports/outbound/iroadmap.repository';
+import { LearningResource } from '@/features/roadmap/domain/value-objects/learning-resource';
 import { AddResourceDto } from '../dtos/roadmap.dto';
 
 /**
