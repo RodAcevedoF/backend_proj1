@@ -1,5 +1,5 @@
 import { Result } from '../../../../core/domain/Result';
-import { IRoadmapRepository } from '../../domain/ports/outbound/IRoadmapRepository';
+import { IRoadmapRepository } from '../../domain/ports/outbound/iroadmap.repository';
 import { LearningResource } from '../../domain/value-objects/LearningResource';
 import { AddResourceDto } from '../dtos/roadmap.dto';
 

@@ -19,6 +19,21 @@ export interface IUserRepository {
   findByEmail(email: Email): Promise<User | null>;
 
   /**
+   * Find user by OAuth provider ID
+   */
+  findByOAuthId(oauthId: string): Promise<User | null>;
+
+  /**
+   * Find user by email verification token
+   */
+  findByVerificationToken(token: string): Promise<User | null>;
+
+  /**
+   * Find user by password reset token
+   */
+  findByPasswordResetToken(token: string): Promise<User | null>;
+
+  /**
    * Find all users that are members of a workspace
    */
   findByWorkspaceId(workspaceId: EntityId): Promise<User[]>;

@@ -1,6 +1,6 @@
 import { IArticleRepository } from '@/features/article/domain/ports/outbound/iarticle.repository';
-import { MongoRoadmapRepository } from '@/features/roadmap/infrastructure/persistence/MongoRoadmapRepository';
-import { LangChainRoadmapGenerator } from '@/features/roadmap/infrastructure/adapters/LangChainRoadmapGenerator';
+import { MongoRoadmapRepository } from '@/features/roadmap/infrastructure/adapters/driven/persistence/MongoRoadmapRepository';
+import { LangChainRoadmapGenerator } from '@/features/roadmap/infrastructure/adapters/driven/llm/LangChainRoadmapGenerator';
 import { CreateRoadmapUseCase } from '@/features/roadmap/app/usecases/create-roadmap.usecase';
 import { GenerateAIRoadmapUseCase } from '@/features/roadmap/app/usecases/generate-ai-roadmap.usecase';
 import { GetRoadmapUseCase } from '@/features/roadmap/app/usecases/get-roadmap.usecase';
@@ -8,10 +8,13 @@ import { UpdateProgressUseCase } from '@/features/roadmap/app/usecases/update-pr
 import { AddResourceUseCase } from '@/features/roadmap/app/usecases/add-resource.usecase';
 import { ListWorkspaceRoadmapsUseCase } from '@/features/roadmap/app/usecases/list-workspace-roadmaps.usecase';
 import { PublishRoadmapUseCase } from '@/features/roadmap/app/usecases/publish-roadmap.usecase';
-import { RoadmapController } from '@/features/roadmap/infrastructure/http/roadmap.controller';
+import { RoadmapServiceAdapter } from '@/features/roadmap/infrastructure/adapters/driver/RoadmapServiceAdapter';
+import { RoadmapController } from '@/features/roadmap/infrastructure/adapters/driver/http/roadmap.controller';
+import { IRoadmapService } from '@/features/roadmap/domain/ports/inbound/IRoadmapService';
 
 export type RoadmapDependencies = {
   roadmapRepository: MongoRoadmapRepository;
+  roadmapService: IRoadmapService;
   roadmapController: RoadmapController;
 };
 
@@ -34,21 +37,26 @@ export function makeRoadmapDependencies(
   const getRoadmapUseCase = new GetRoadmapUseCase(roadmapRepository);
   const updateProgressUseCase = new UpdateProgressUseCase(roadmapRepository);
   const addResourceUseCase = new AddResourceUseCase(roadmapRepository);
-  const listWorkspaceRoadmapsUseCase = new ListWorkspaceRoadmapsUseCase(roadmapRepository);
+  const listWorkspaceRoadmapsUseCase = new ListWorkspaceRoadmapsUseCase(
+    roadmapRepository
+  );
   const publishRoadmapUseCase = new PublishRoadmapUseCase(roadmapRepository);
 
-  const roadmapController = new RoadmapController(
+  const roadmapService = new RoadmapServiceAdapter(
     createRoadmapUseCase,
     generateAIRoadmapUseCase,
     getRoadmapUseCase,
+    listWorkspaceRoadmapsUseCase,
     updateProgressUseCase,
     addResourceUseCase,
-    listWorkspaceRoadmapsUseCase,
     publishRoadmapUseCase
   );
 
+  const roadmapController = new RoadmapController(roadmapService);
+
   return {
     roadmapRepository,
+    roadmapService,
     roadmapController,
   };
 }

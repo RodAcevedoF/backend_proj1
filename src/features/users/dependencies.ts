@@ -1,37 +1,51 @@
-import { IPasswordHasher } from '@/core/infrastructure/ports/IPasswordHasher';
-import { ITokenService } from '@/core/infrastructure/ports/ITokenService';
+import { IPasswordHasher } from '@/core/domain/ports/IPasswordHasher';
+import { ITokenService } from '@/core/domain/ports/ITokenService';
+import { IEmailService } from '@/core/domain/ports/IEmailService';
+import { IOAuthProvider } from '@/core/domain/ports/IOAuthProvider';
 import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/IWorkspaceService';
-import { RegisterUserUseCase } from '@/features/users/app/usecases/register-user.usecase';
-import { LoginUserUseCase } from '@/features/users/app/usecases/login-user.usecase';
-import { UserServiceAdapter } from '@/features/users/app/UserServiceAdapter';
-import { MongoUserRepository } from '@/features/users/infrastructure/persistence/MongoUserRepository';
-import { AuthController } from '@/features/users/infrastructure/http/auth.controller';
-import { IUserService } from '@/features/users/domain/ports/inbound/IUserService';
+import { RegisterUserUseCase } from './app/usecases/register-user.usecase';
+import { LoginUserUseCase } from './app/usecases/login-user.usecase';
+import { VerifyEmailUseCase } from './app/usecases/verify-email.usecase';
+import { SendVerificationEmailUseCase } from './app/usecases/send-verification-email.usecase';
+import { GoogleAuthUseCase } from './app/usecases/google-auth.usecase';
+import { RequestPasswordResetUseCase } from './app/usecases/request-password-reset.usecase';
+import { ResetPasswordUseCase } from './app/usecases/reset-password.usecase';
+import { UserServiceAdapter } from './infrastructure/adapters/driver/user-service.adapter';
+import { MongoUserRepository } from './infrastructure/adapters/driven/persistence/MongoUserRepository';
+import { AuthController } from './infrastructure/adapters/driver/http/auth.controller';
+import { IUserService } from './domain/ports/inbound/iuser.service';
 
 export type UsersDependencies = {
   userRepository: MongoUserRepository;
   userService: IUserService;
-  registerUseCase: RegisterUserUseCase;
-  loginUseCase: LoginUserUseCase;
   authController: AuthController;
+  verifyEmailUseCase: VerifyEmailUseCase;
+  sendVerificationEmailUseCase: SendVerificationEmailUseCase;
+  googleAuthUseCase: GoogleAuthUseCase;
+  requestPasswordResetUseCase: RequestPasswordResetUseCase;
+  resetPasswordUseCase: ResetPasswordUseCase;
 };
 
 export type UsersExternalDeps = {
   passwordHasher: IPasswordHasher;
   tokenService: ITokenService;
+  emailService: IEmailService;
+  oauthProvider: IOAuthProvider;
   workspaceService: IWorkspaceService;
+  frontendUrl: string;
 };
 
 export function makeUsersDependencies(
   external: UsersExternalDeps
 ): UsersDependencies {
   const userRepository = new MongoUserRepository();
-  const userService = new UserServiceAdapter(userRepository);
 
   const registerUseCase = new RegisterUserUseCase(
     userRepository,
     external.workspaceService,
-    external.passwordHasher
+    external.passwordHasher,
+    external.emailService,
+    external.frontendUrl
   );
 
   const loginUseCase = new LoginUserUseCase(
@@ -40,13 +54,57 @@ export function makeUsersDependencies(
     external.tokenService
   );
 
-  const authController = new AuthController(registerUseCase, loginUseCase);
+  const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
+
+  const sendVerificationEmailUseCase = new SendVerificationEmailUseCase(
+    userRepository,
+    external.emailService,
+    external.frontendUrl
+  );
+
+  const googleAuthUseCase = new GoogleAuthUseCase(
+    userRepository,
+    external.oauthProvider,
+    external.tokenService
+  );
+
+  const requestPasswordResetUseCase = new RequestPasswordResetUseCase(
+    userRepository,
+    external.emailService,
+    external.frontendUrl
+  );
+
+  const resetPasswordUseCase = new ResetPasswordUseCase(
+    userRepository,
+    external.passwordHasher
+  );
+
+  const userService = new UserServiceAdapter(
+    userRepository,
+    registerUseCase,
+    loginUseCase
+  );
+
+  const authController = new AuthController(
+    userService,
+    verifyEmailUseCase,
+    sendVerificationEmailUseCase,
+    googleAuthUseCase,
+    requestPasswordResetUseCase,
+    resetPasswordUseCase,
+    external.oauthProvider,
+    external.tokenService,
+    external.frontendUrl
+  );
 
   return {
     userRepository,
     userService,
-    registerUseCase,
-    loginUseCase,
     authController,
+    verifyEmailUseCase,
+    sendVerificationEmailUseCase,
+    googleAuthUseCase,
+    requestPasswordResetUseCase,
+    resetPasswordUseCase,
   };
 }

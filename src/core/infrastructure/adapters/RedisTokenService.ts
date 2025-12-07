@@ -1,6 +1,6 @@
 import { createClient, RedisClientType } from 'redis';
 import { randomUUID } from 'crypto';
-import { ITokenService, SessionData } from '../ports/ITokenService';
+import { ITokenService, SessionData } from '../../domain/ports/ITokenService';
 
 /**
  * Redis-backed Session Token Service

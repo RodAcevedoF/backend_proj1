@@ -1,8 +1,9 @@
 import 'dotenv/config';
-import express, { type Request, type Response, type Express } from 'express';
+import express, { type Express } from 'express';
 import loadMiddlewares from '../middlewares';
 import loadCheckers from '../checkers';
 import { registerRoutes } from '../routes';
+import { errorHandler } from '../middleware';
 
 export function createServer() {
   const app: Express = express();
@@ -21,7 +22,7 @@ export function createServer() {
     });
   });
 
-  //app.use(errorHandler);
+  app.use(errorHandler);
 
   return app;
 }

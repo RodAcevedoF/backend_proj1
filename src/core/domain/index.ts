@@ -6,3 +6,11 @@ export { Email } from './Email';
 export { DateRange } from './DateRange';
 export { Result } from './Result';
 export { DomainEvent, BaseDomainEvent } from './DomainEvent';
+export {
+  Role,
+  Roles,
+  hasMinimumRole,
+  canEdit,
+  canManage,
+  isOwner,
+} from './Role';

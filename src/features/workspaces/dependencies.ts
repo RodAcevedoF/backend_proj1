@@ -1,42 +1,56 @@
-import { IUserService } from '@/features/users/domain/ports/inbound/IUserService';
-import { CreateWorkspaceUseCase } from '@/features/workspaces/app/usecases/create-workspace.usecase';
-import { InviteMemberUseCase } from '@/features/workspaces/app/usecases/invite-member.usecase';
-import { MongoWorkspaceRepository } from '@/features/workspaces/infrastructure/persistence/MongoWorkspaceRepository';
-import { WorkspaceServiceAdapter } from '@/features/workspaces/app/WorkspaceServiceAdapter';
-import { IWorkspaceService } from '@/features/workspaces/domain/ports/inbound/IWorkspaceService';
+import { IUserService } from '@/features/users/domain/ports/inbound/iuser.service';
+import { CreateWorkspaceUseCase } from './app/usecases/create-workspace.usecase';
+import { InviteMemberUseCase } from './app/usecases/invite-member.usecase';
+import { MongoWorkspaceRepository } from './infrastructure/adapters/driven/MongoWorkspaceRepository';
+import { WorkspaceServiceAdapter } from './infrastructure/adapters/driver/workspace-service.adapter';
+import { WorkspaceController } from './infrastructure/adapters/driver/http/workspace.controller';
+import { IWorkspaceService } from './domain/ports/inbound/IWorkspaceService';
 
 export type WorkspacesDependencies = {
   workspaceRepository: MongoWorkspaceRepository;
-  createWorkspaceUseCase: CreateWorkspaceUseCase;
-  inviteMemberUseCase: InviteMemberUseCase;
   workspaceService: IWorkspaceService;
+  workspaceController: WorkspaceController;
 };
 
 export type WorkspacesExternalDeps = {
-  userService: IUserService;
+  userService?: IUserService;
+};
+
+// Stub user service for when we need workspace service before users are initialized
+const stubUserService: IUserService = {
+  register: async () => { throw new Error('Not implemented'); },
+  login: async () => { throw new Error('Not implemented'); },
+  findById: async () => null,
+  findByEmail: async () => null,
+  save: async () => {},
 };
 
 export function makeWorkspacesDependencies(
-  external: WorkspacesExternalDeps
+  external: WorkspacesExternalDeps = {}
 ): WorkspacesDependencies {
   const workspaceRepository = new MongoWorkspaceRepository();
+  const userService = external.userService || stubUserService;
 
   const createWorkspaceUseCase = new CreateWorkspaceUseCase(
     workspaceRepository,
-    external.userService
+    userService
   );
 
   const inviteMemberUseCase = new InviteMemberUseCase(
     workspaceRepository,
-    external.userService
+    userService
   );
 
-  const workspaceService = new WorkspaceServiceAdapter(createWorkspaceUseCase);
+  const workspaceService = new WorkspaceServiceAdapter(
+    createWorkspaceUseCase,
+    inviteMemberUseCase
+  );
+
+  const workspaceController = new WorkspaceController(workspaceService);
 
   return {
     workspaceRepository,
-    createWorkspaceUseCase,
-    inviteMemberUseCase,
     workspaceService,
+    workspaceController,
   };
 }

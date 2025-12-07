@@ -4,8 +4,8 @@ import {
   UserResponseDto,
 } from '@/features/users/app/dtos/user.dto';
 import { IUserRepository } from '@/features/users/domain/ports/outbound/IUser.repository';
-import { IPasswordHasher } from '@/core/infrastructure/ports/IPasswordHasher';
-import { ITokenService } from '@/core/infrastructure/ports/ITokenService';
+import { IPasswordHasher } from '@/core/domain/ports/IPasswordHasher';
+import { ITokenService } from '@/core/domain/ports/ITokenService';
 import { Email, Result } from '@/core/domain';
 import { User } from '@/features/users/domain/User';
 
@@ -37,6 +37,11 @@ export class LoginUserUseCase {
 
     if (!passwordValid) {
       return Result.fail('Invalid credentials');
+    }
+
+    // Check if email is verified (optional - can be made strict)
+    if (!user.isEmailVerified) {
+      return Result.fail('Please verify your email before logging in');
     }
 
     // Record login

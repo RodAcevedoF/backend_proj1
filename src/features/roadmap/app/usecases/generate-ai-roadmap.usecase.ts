@@ -1,6 +1,6 @@
 import { Result } from '../../../../core/domain/Result';
-import { IRoadmapRepository } from '../../domain/ports/outbound/IRoadmapRepository';
-import { IAIRoadmapGenerator } from '../../domain/ports/outbound/IAIRoadmapGenerator';
+import { IRoadmapRepository } from '../../domain/ports/outbound/iroadmap.repository';
+import { IAIRoadmapGenerator } from '../../domain/ports/outbound/ia-iroadmap-generator';
 import { IArticleRepository } from '../../../article/domain/ports/outbound/iarticle.repository';
 import { Roadmap } from '../../domain/Roadmap';
 import { GenerateAIRoadmapDto, RoadmapResponseDto } from '../dtos/roadmap.dto';

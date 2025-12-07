@@ -1,7 +1,14 @@
 import { ValueObject } from '../../../core/domain/ValueObject';
 import { EntityId } from '../../../core/domain/EntityId';
+import {
+  Role,
+  canEdit as roleCanEdit,
+  canManage as roleCanManage,
+  isOwner as roleIsOwner,
+} from '../../../core/domain/Role';
 
-export type WorkspaceMemberRole = 'owner' | 'admin' | 'editor' | 'viewer';
+/** @deprecated Use Role from @/core/domain instead */
+export type WorkspaceMemberRole = Role;
 
 interface WorkspaceMemberProps {
   userId: EntityId;
@@ -66,21 +73,21 @@ export class WorkspaceMember extends ValueObject<WorkspaceMemberProps> {
    * Check if member can edit resources
    */
   canEdit(): boolean {
-    return ['owner', 'admin', 'editor'].includes(this.props.role);
+    return roleCanEdit(this.props.role);
   }
 
   /**
    * Check if member can manage workspace
    */
   canManage(): boolean {
-    return ['owner', 'admin'].includes(this.props.role);
+    return roleCanManage(this.props.role);
   }
 
   /**
    * Check if member is owner
    */
   isOwner(): boolean {
-    return this.props.role === 'owner';
+    return roleIsOwner(this.props.role);
   }
 
   /**

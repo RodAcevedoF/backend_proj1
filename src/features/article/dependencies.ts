@@ -5,8 +5,10 @@ import { FindArticlesByWorkspaceUseCase } from './app/usecases/find-by-workspace
 import { FindArticlesUseCase } from './app/usecases/find-articles.usecase';
 import { GetArticleByIdUseCase } from './app/usecases/get-article.usecase';
 import { ImportExternalArticleUsecase } from './app/usecases/import-external-article.usecase';
+import { ImportFileUseCase } from './app/usecases/import-file.usecase';
 import { SearchExternalArticlesUseCase } from './app/usecases/search-external-articles.usecase';
 import { UpdateArticleUseCase } from './app/usecases/update-article.usecase';
+import { SpreadsheetParser } from './infrastructure/adapters/driven/parsers/spreadsheet-parser';
 import { LangChainArticleEnrichment } from './infrastructure/adapters/driven/providers/lanchain-article-enrichment';
 import { SemanticScholarProvider } from './infrastructure/adapters/driven/providers/semantic-scholar-provider';
 import { MongoArticleRepository } from './infrastructure/adapters/driven/repositories/mongo.repository';
@@ -24,6 +26,7 @@ export type ArticleDependencies = {
   deleteUseCase: DeleteArticleUseCase;
   searchExternalUseCase: SearchExternalArticlesUseCase;
   importExternalUseCase: ImportExternalArticleUsecase;
+  importFileUseCase: ImportFileUseCase;
   articleService: ArticleServiceAdapter;
   articleController: ArticleController;
 };
@@ -49,6 +52,13 @@ export function makeArticleDependencies(): ArticleDependencies {
     articleRepository
   );
 
+  const fileParser = new SpreadsheetParser();
+  const importFileUseCase = new ImportFileUseCase(
+    fileParser,
+    llm,
+    articleRepository
+  );
+
   const articleService = new ArticleServiceAdapter(
     createUseCase,
     getByIdUseCase,
@@ -58,7 +68,8 @@ export function makeArticleDependencies(): ArticleDependencies {
     bulkInsertUseCase,
     deleteUseCase,
     importExternalUseCase,
-    searchExternalUseCase
+    searchExternalUseCase,
+    importFileUseCase
   );
 
   const articleController = new ArticleController(articleService);
@@ -74,6 +85,7 @@ export function makeArticleDependencies(): ArticleDependencies {
     deleteUseCase,
     searchExternalUseCase,
     importExternalUseCase,
+    importFileUseCase,
     articleService,
     articleController,
   };

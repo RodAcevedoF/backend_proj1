@@ -1,5 +1,5 @@
 import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/IWorkspace.repository';
-import { IUserService } from '@/features/users/domain/ports/inbound/IUserService';
+import { IUserService } from '@/features/users/domain/ports/inbound/iuser.service';
 import { Workspace } from '@/features/workspaces/domain/Workspace';
 import { EntityId, Result } from '@/core/domain';
 import { CreateWorkspaceDto } from '@/features/workspaces/app/dtos/workspace.dto';

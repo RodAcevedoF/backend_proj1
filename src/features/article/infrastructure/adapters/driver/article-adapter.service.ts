@@ -1,4 +1,4 @@
-import { IArticleService } from '../../../app/iarticle.service';
+import { IArticleService } from '../../../domain/ports/inbound/iarticle.service';
 import { CreateArticleUseCase } from '../../../app/usecases/create-article.usecase';
 import { GetArticleByIdUseCase } from '../../../app/usecases/get-article.usecase';
 import { CreateArticleDTO } from '../../../app/dtos/create-article.dto';
@@ -18,8 +18,10 @@ import {
   PaginatedArticlesResponseDTO,
 } from '../../../app/dtos/find-by-workspace.dto';
 import { ImportExternalArticleUsecase } from '@/features/article/app/usecases/import-external-article.usecase';
+import { ImportFileUseCase } from '@/features/article/app/usecases/import-file.usecase';
 import { SearchExternalArticlesUseCase } from '@/features/article/app/usecases/search-external-articles.usecase';
 import { ImportExternalArticleDTO } from '@/features/article/app/dtos/import-external-article.dto';
+import { ImportFileDTO, ImportFileResultDTO } from '@/features/article/app/dtos/import-file.dto';
 import { SearchExternalArticlesDTO } from '@/features/article/app/dtos/search-external-articles.dto';
 import { SearchResult } from '@/features/article/domain/ports/outbound/iscientific-article-provider';
 
@@ -33,7 +35,8 @@ export class ArticleServiceAdapter implements IArticleService {
     private readonly bulkInsertArticles: BulkInsertArticlesUseCase,
     private readonly deleteArticle: DeleteArticleUseCase,
     private readonly importExternal: ImportExternalArticleUsecase,
-    private readonly searchExternal: SearchExternalArticlesUseCase
+    private readonly searchExternal: SearchExternalArticlesUseCase,
+    private readonly importFile: ImportFileUseCase
   ) {}
 
   async create(input: CreateArticleDTO): Promise<ArticleResponseDTO> {
@@ -85,5 +88,9 @@ export class ArticleServiceAdapter implements IArticleService {
       createdAt: primitives.createdAt.toISOString(),
       updatedAt: primitives.updatedAt.toISOString(),
     };
+  }
+
+  async importFromFile(input: ImportFileDTO): Promise<ImportFileResultDTO> {
+    return await this.importFile.execute(input);
   }
 }

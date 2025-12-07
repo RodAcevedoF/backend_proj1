@@ -12,12 +12,20 @@ import {
   UserPasswordChangedEvent,
 } from './UserEvents';
 
+export type AuthProvider = 'email' | 'google';
+
 export interface UserProps {
   email: Email;
   passwordHash: string;
   profile: UserProfile;
   workspaces: WorkspaceMembership[];
   isEmailVerified: boolean;
+  authProvider: AuthProvider;
+  oauthId?: string;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -36,7 +44,7 @@ export class User extends AggregateRoot {
   }
 
   /**
-   * Create a new user
+   * Create a new user with email/password
    */
   static create(
     email: Email,
@@ -62,6 +70,7 @@ export class User extends AggregateRoot {
       profile: UserProfile.create(),
       workspaces,
       isEmailVerified: false,
+      authProvider: 'email',
       createdAt: now,
       updatedAt: now,
     });
@@ -73,6 +82,37 @@ export class User extends AggregateRoot {
         email.toString(),
         initialWorkspace?.workspaceId || EntityId.create()
       )
+    );
+
+    return user;
+  }
+
+  /**
+   * Create a new user from OAuth provider
+   */
+  static createFromOAuth(
+    email: Email,
+    oauthId: string,
+    provider: AuthProvider,
+    profile?: { firstName?: string; lastName?: string; avatarUrl?: string }
+  ): User {
+    const userId = EntityId.create();
+    const now = new Date();
+
+    const user = new User(userId, {
+      email,
+      passwordHash: '', // No password for OAuth users
+      profile: UserProfile.create(profile),
+      workspaces: [],
+      isEmailVerified: true, // OAuth emails are pre-verified
+      authProvider: provider,
+      oauthId,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    user.addDomainEvent(
+      new UserCreatedEvent(userId, email.toString(), EntityId.create())
     );
 
     return user;
@@ -133,11 +173,87 @@ export class User extends AggregateRoot {
   }
 
   /**
-   * Verify user's email
+   * Set email verification token
+   */
+  setEmailVerificationToken(token: string, expiresInHours: number = 24): void {
+    this.props.emailVerificationToken = token;
+    this.props.emailVerificationExpires = new Date(
+      Date.now() + expiresInHours * 60 * 60 * 1000
+    );
+    this.props.updatedAt = new Date();
+  }
+
+  /**
+   * Verify email with token
+   */
+  verifyEmailWithToken(token: string): boolean {
+    if (
+      this.props.emailVerificationToken !== token ||
+      !this.props.emailVerificationExpires ||
+      this.props.emailVerificationExpires < new Date()
+    ) {
+      return false;
+    }
+
+    this.props.isEmailVerified = true;
+    this.props.emailVerificationToken = undefined;
+    this.props.emailVerificationExpires = undefined;
+    this.props.updatedAt = new Date();
+    return true;
+  }
+
+  /**
+   * Verify user's email (direct, for OAuth)
    */
   verifyEmail(): void {
     this.props.isEmailVerified = true;
     this.props.updatedAt = new Date();
+  }
+
+  /**
+   * Set password reset token
+   */
+  setPasswordResetToken(token: string, expiresInHours: number = 1): void {
+    this.props.passwordResetToken = token;
+    this.props.passwordResetExpires = new Date(
+      Date.now() + expiresInHours * 60 * 60 * 1000
+    );
+    this.props.updatedAt = new Date();
+  }
+
+  /**
+   * Reset password with token
+   */
+  resetPasswordWithToken(token: string, newPasswordHash: string): boolean {
+    if (
+      this.props.passwordResetToken !== token ||
+      !this.props.passwordResetExpires ||
+      this.props.passwordResetExpires < new Date()
+    ) {
+      return false;
+    }
+
+    this.props.passwordHash = newPasswordHash;
+    this.props.passwordResetToken = undefined;
+    this.props.passwordResetExpires = undefined;
+    this.props.updatedAt = new Date();
+    this.addDomainEvent(new UserPasswordChangedEvent(this.id));
+    return true;
+  }
+
+  /**
+   * Check if user is OAuth-based
+   */
+  isOAuthUser(): boolean {
+    return this.props.authProvider !== 'email';
+  }
+
+  get authProvider(): AuthProvider {
+    return this.props.authProvider;
+  }
+
+  get oauthId(): string | undefined {
+    return this.props.oauthId;
   }
 
   /**
@@ -294,6 +410,12 @@ export class User extends AggregateRoot {
       profile: this.props.profile.toPrimitives(),
       workspaces: this.props.workspaces.map((m) => m.toPrimitives()),
       isEmailVerified: this.props.isEmailVerified,
+      authProvider: this.props.authProvider,
+      oauthId: this.props.oauthId,
+      emailVerificationToken: this.props.emailVerificationToken,
+      emailVerificationExpires: this.props.emailVerificationExpires,
+      passwordResetToken: this.props.passwordResetToken,
+      passwordResetExpires: this.props.passwordResetExpires,
       lastLoginAt: this.props.lastLoginAt,
       createdAt: this.props.createdAt,
       updatedAt: this.props.updatedAt,

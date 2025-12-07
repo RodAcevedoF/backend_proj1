@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { IPasswordHasher } from '../ports/IPasswordHasher';
+import { IPasswordHasher } from '../../domain/ports/IPasswordHasher';
 
 /**
  * Bcrypt implementation of Password Hasher
