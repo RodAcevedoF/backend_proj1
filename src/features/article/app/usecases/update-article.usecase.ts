@@ -25,6 +25,7 @@ export class UpdateArticleUseCase {
     const primitives = updatedArticle.toPrimitives();
     return {
       ...primitives,
+      publishedAt: primitives.publishedAt?.toISOString(),
       createdAt: primitives.createdAt.toISOString(),
       updatedAt: primitives.updatedAt.toISOString(),
     };

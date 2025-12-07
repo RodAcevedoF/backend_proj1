@@ -6,7 +6,12 @@ import { validateBody } from '@/core/infrastructure/drivers/http/middleware/vali
 export function createArticleRouter(ctrl: ArticleController) {
   const router = Router();
 
+  // External routes must come before :id to avoid conflicts
+  router.get('/external/search', ctrl.searchExternal);
+  router.post('/external/import', ctrl.importExternal);
+
   router.post('/', validateBody(CreateArticleSchema), ctrl.create);
   router.get('/:id', ctrl.getById);
+
   return router;
 }

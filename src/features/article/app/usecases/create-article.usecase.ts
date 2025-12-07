@@ -15,6 +15,14 @@ export class CreateArticleUseCase {
       title: input.title,
       content: input.content,
       tags: input.tags ?? [],
+      status: input.status ?? 'user_created',
+      source: input.source ?? 'user',
+      externalId: input.externalId,
+      summary: input.summary,
+      categories: input.categories,
+      url: input.url,
+      authors: input.authors,
+      publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -24,6 +32,7 @@ export class CreateArticleUseCase {
     const primitives = article.toPrimitives();
     return {
       ...primitives,
+      publishedAt: primitives.publishedAt?.toISOString(),
       createdAt: primitives.createdAt.toISOString(),
       updatedAt: primitives.updatedAt.toISOString(),
     };

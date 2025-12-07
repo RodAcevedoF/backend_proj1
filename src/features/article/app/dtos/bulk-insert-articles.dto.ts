@@ -1,11 +1,5 @@
+import { CreateArticleDTO } from './create-article.dto';
+
 export interface BulkInsertArticlesDTO {
-  articles: Array<{
-    id: string;
-    workspaceId: string;
-    title: string;
-    content: string;
-    tags?: string[];
-    createdAt: string; // ISO
-    updatedAt: string; // ISO
-  }>;
+  articles: Array<CreateArticleDTO>;
 }

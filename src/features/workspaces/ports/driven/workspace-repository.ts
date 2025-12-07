@@ -1,5 +1,6 @@
-import { Workspace } from '@/features/workspaces/Workspace';
+/* import { Workspace } from '../../domain/Workspace';
 
 export interface WorkspaceRepository {
   findById(id: string): Promise<Workspace | null>;
 }
+ */

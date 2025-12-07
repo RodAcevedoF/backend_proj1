@@ -11,6 +11,7 @@ export class GetArticleByIdUseCase {
     const primitives = article.toPrimitives();
     return {
       ...primitives,
+      publishedAt: primitives.publishedAt?.toISOString(),
       createdAt: primitives.createdAt.toISOString(),
       updatedAt: primitives.updatedAt.toISOString(),
     };

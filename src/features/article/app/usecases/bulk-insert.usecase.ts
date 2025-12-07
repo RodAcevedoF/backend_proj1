@@ -2,6 +2,7 @@ import { IArticleRepository } from '@/features/article/domain/ports/outbound/iar
 import { Article } from '../../domain/Article';
 import { BulkInsertArticlesDTO } from '../dtos/bulk-insert-articles.dto';
 import { ArticleResponseDTO } from '../dtos/article-response.dto';
+import { randomUUID } from 'crypto';
 
 export class BulkInsertArticlesUseCase {
   constructor(private readonly repo: IArticleRepository) {}
@@ -10,13 +11,24 @@ export class BulkInsertArticlesUseCase {
     const articles = input.articles.map(
       (articleData) =>
         new Article({
-          id: articleData.id,
+          id: randomUUID(),
           workspaceId: articleData.workspaceId,
+          userId: articleData.userId,
           title: articleData.title,
           content: articleData.content,
           tags: articleData.tags ?? [],
-          createdAt: new Date(articleData.createdAt),
-          updatedAt: new Date(articleData.updatedAt),
+          status: articleData.status ?? 'user_created',
+          source: articleData.source ?? 'user',
+          externalId: articleData.externalId,
+          summary: articleData.summary,
+          categories: articleData.categories,
+          url: articleData.url,
+          authors: articleData.authors,
+          publishedAt: articleData.publishedAt
+            ? new Date(articleData.publishedAt)
+            : undefined,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         })
     );
 
@@ -26,6 +38,7 @@ export class BulkInsertArticlesUseCase {
       const primitives = article.toPrimitives();
       return {
         ...primitives,
+        publishedAt: primitives.publishedAt?.toISOString(),
         createdAt: primitives.createdAt.toISOString(),
         updatedAt: primitives.updatedAt.toISOString(),
       };
