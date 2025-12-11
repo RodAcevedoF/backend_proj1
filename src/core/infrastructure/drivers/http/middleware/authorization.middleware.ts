@@ -1,60 +1,82 @@
 import { Request, Response, NextFunction } from 'express';
 import { IWorkspaceRepository } from '@/features/workspaces/domain/ports/outbound/iworkspace.repository';
 import { EntityId } from '@/core/domain/EntityId';
-import { Role, hasMinimumRole } from '@/core/domain/Role';
+import { Role, hasMinimumRole, canEdit, canManage } from '@/core/domain/Role';
 
 /**
  * Authorization Middleware
- * Checks workspace permissions
+ * Checks workspace permissions and attaches workspace context to request
  */
 export class AuthorizationMiddleware {
   constructor(private readonly workspaceRepository: IWorkspaceRepository) {}
 
   /**
+   * Helper to get workspace and member, attach to req.workspace
+   */
+  private async getWorkspaceContext(
+    req: Request,
+    res: Response,
+    workspaceIdParam: string
+  ): Promise<{ role: Role; workspaceId: string } | null> {
+    if (!req.user) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Authentication required',
+      });
+      return null;
+    }
+
+    const workspaceId = req.params[workspaceIdParam] || req.body?.workspaceId;
+    if (!workspaceId) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Workspace ID required',
+      });
+      return null;
+    }
+
+    const userId = EntityId.from(req.user.userId);
+    const wsId = EntityId.from(workspaceId);
+
+    const workspace = await this.workspaceRepository.findById(wsId);
+
+    if (!workspace) {
+      res.status(404).json({
+        error: 'Not Found',
+        message: 'Workspace not found',
+      });
+      return null;
+    }
+
+    const member = workspace.getMember(userId);
+
+    if (!member) {
+      res.status(403).json({
+        error: 'Forbidden',
+        message: 'You are not a member of this workspace',
+      });
+      return null;
+    }
+
+    // Attach workspace context to request
+    req.workspace = {
+      workspaceId,
+      role: member.role,
+    };
+
+    return { role: member.role, workspaceId };
+  }
+
+  /**
    * Require user to have one of the specified roles in the workspace
-   * @param roles - Allowed roles (e.g., 'admin', 'editor')
-   * @param workspaceIdParam - Request param name for workspace ID
    */
   requireRole(roles: Role[], workspaceIdParam: string = 'workspaceId') {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (!req.user) {
-          return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'Authentication required',
-          });
-        }
+        const context = await this.getWorkspaceContext(req, res, workspaceIdParam);
+        if (!context) return;
 
-        const workspaceId = req.params[workspaceIdParam];
-        if (!workspaceId) {
-          return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Workspace ID required',
-          });
-        }
-
-        const userId = EntityId.from(req.user.userId);
-        const wsId = EntityId.from(workspaceId);
-
-        const workspace = await this.workspaceRepository.findById(wsId);
-
-        if (!workspace) {
-          return res.status(404).json({
-            error: 'Not Found',
-            message: 'Workspace not found',
-          });
-        }
-
-        const member = workspace.getMember(userId);
-
-        if (!member) {
-          return res.status(403).json({
-            error: 'Forbidden',
-            message: 'You are not a member of this workspace',
-          });
-        }
-
-        if (!roles.includes(member.role)) {
+        if (!roles.includes(context.role)) {
           return res.status(403).json({
             error: 'Forbidden',
             message: `Insufficient permissions - requires one of: ${roles.join(', ')}`,
@@ -66,7 +88,6 @@ export class AuthorizationMiddleware {
         return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Authorization check failed',
-          trace: error instanceof Error ? error.message : String(error),
         });
       }
     };
@@ -75,49 +96,14 @@ export class AuthorizationMiddleware {
   /**
    * Require user to have at least the specified minimum role
    * Uses role hierarchy: owner > admin > editor > viewer
-   * @param minRole - Minimum required role
-   * @param workspaceIdParam - Request param name for workspace ID
    */
   requireMinRole(minRole: Role, workspaceIdParam: string = 'workspaceId') {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (!req.user) {
-          return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'Authentication required',
-          });
-        }
+        const context = await this.getWorkspaceContext(req, res, workspaceIdParam);
+        if (!context) return;
 
-        const workspaceId = req.params[workspaceIdParam];
-        if (!workspaceId) {
-          return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Workspace ID required',
-          });
-        }
-
-        const userId = EntityId.from(req.user.userId);
-        const wsId = EntityId.from(workspaceId);
-
-        const workspace = await this.workspaceRepository.findById(wsId);
-
-        if (!workspace) {
-          return res.status(404).json({
-            error: 'Not Found',
-            message: 'Workspace not found',
-          });
-        }
-
-        const member = workspace.getMember(userId);
-
-        if (!member) {
-          return res.status(403).json({
-            error: 'Forbidden',
-            message: 'You are not a member of this workspace',
-          });
-        }
-
-        if (!hasMinimumRole(member.role, minRole)) {
+        if (!hasMinimumRole(context.role, minRole)) {
           return res.status(403).json({
             error: 'Forbidden',
             message: `Insufficient permissions - requires at least ${minRole} role`,
@@ -129,90 +115,41 @@ export class AuthorizationMiddleware {
         return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Authorization check failed',
-          trace: error instanceof Error ? error.message : String(error),
         });
       }
     };
   }
 
   /**
-   * Require user to be a workspace member
+   * Require user to be a workspace member (any role)
    */
   requireWorkspaceMember(workspaceIdParam: string = 'workspaceId') {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (!req.user) {
-          return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'Authentication required',
-          });
-        }
+        const context = await this.getWorkspaceContext(req, res, workspaceIdParam);
+        if (!context) return;
 
-        const workspaceId = req.params[workspaceIdParam];
-        if (!workspaceId) {
-          return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Workspace ID required',
-          });
-        }
-
-        const userId = EntityId.from(req.user.userId);
-        const wsId = EntityId.from(workspaceId);
-
-        const isMember = await this.workspaceRepository.isMember(wsId, userId);
-
-        if (!isMember) {
-          return res.status(403).json({
-            error: 'Forbidden',
-            message: 'You are not a member of this workspace',
-          });
-        }
-
+        // If we got here, user is a member
         next();
       } catch (error) {
         return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Authorization check failed',
-          trace: error instanceof Error ? error.message : String(error),
         });
       }
     };
   }
 
   /**
-   * Require user to have edit permissions
+   * Require user to have edit permissions (editor, admin, or owner)
    */
   requireWorkspaceEditor(workspaceIdParam: string = 'workspaceId') {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (!req.user) {
-          return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'Authentication required',
-          });
-        }
+        const context = await this.getWorkspaceContext(req, res, workspaceIdParam);
+        if (!context) return;
 
-        const workspaceId = req.params[workspaceIdParam];
-        if (!workspaceId) {
-          return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Workspace ID required',
-          });
-        }
-
-        const userId = EntityId.from(req.user.userId);
-        const wsId = EntityId.from(workspaceId);
-
-        const workspace = await this.workspaceRepository.findById(wsId);
-
-        if (!workspace) {
-          return res.status(404).json({
-            error: 'Not Found',
-            message: 'Workspace not found',
-          });
-        }
-
-        if (!workspace.canEdit(userId)) {
+        if (!canEdit(context.role)) {
           return res.status(403).json({
             error: 'Forbidden',
             message: 'Insufficient permissions - editor role required',
@@ -224,46 +161,21 @@ export class AuthorizationMiddleware {
         return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Authorization check failed',
-          trace: error instanceof Error ? error.message : String(error),
         });
       }
     };
   }
 
   /**
-   * Require user to have management permissions
+   * Require user to have management permissions (admin or owner)
    */
   requireWorkspaceManager(workspaceIdParam: string = 'workspaceId') {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (!req.user) {
-          return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'Authentication required',
-          });
-        }
+        const context = await this.getWorkspaceContext(req, res, workspaceIdParam);
+        if (!context) return;
 
-        const workspaceId = req.params[workspaceIdParam];
-        if (!workspaceId) {
-          return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Workspace ID required',
-          });
-        }
-
-        const userId = EntityId.from(req.user.userId);
-        const wsId = EntityId.from(workspaceId);
-
-        const workspace = await this.workspaceRepository.findById(wsId);
-
-        if (!workspace) {
-          return res.status(404).json({
-            error: 'Not Found',
-            message: 'Workspace not found',
-          });
-        }
-
-        if (!workspace.canManage(userId)) {
+        if (!canManage(context.role)) {
           return res.status(403).json({
             error: 'Forbidden',
             message: 'Insufficient permissions - admin role required',
@@ -275,7 +187,6 @@ export class AuthorizationMiddleware {
         return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Authorization check failed',
-          trace: error instanceof Error ? error.message : String(error),
         });
       }
     };
@@ -287,34 +198,10 @@ export class AuthorizationMiddleware {
   requireWorkspaceOwner(workspaceIdParam: string = 'workspaceId') {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        if (!req.user) {
-          return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'Authentication required',
-          });
-        }
+        const context = await this.getWorkspaceContext(req, res, workspaceIdParam);
+        if (!context) return;
 
-        const workspaceId = req.params[workspaceIdParam];
-        if (!workspaceId) {
-          return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Workspace ID required',
-          });
-        }
-
-        const userId = EntityId.from(req.user.userId);
-        const wsId = EntityId.from(workspaceId);
-
-        const workspace = await this.workspaceRepository.findById(wsId);
-
-        if (!workspace) {
-          return res.status(404).json({
-            error: 'Not Found',
-            message: 'Workspace not found',
-          });
-        }
-
-        if (!workspace.isOwner(userId)) {
+        if (context.role !== 'owner') {
           return res.status(403).json({
             error: 'Forbidden',
             message: 'Insufficient permissions - owner role required',
@@ -322,12 +209,10 @@ export class AuthorizationMiddleware {
         }
 
         next();
-      } catch (error: unknown) {
-        const trace = error instanceof Error ? error.message : String(error);
+      } catch (error) {
         return res.status(500).json({
           error: 'Internal Server Error',
           message: 'Authorization check failed',
-          trace,
         });
       }
     };

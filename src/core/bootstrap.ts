@@ -22,6 +22,10 @@ import {
   makeArticleDependencies,
   ArticleDependencies,
 } from '@/features/article/dependencies';
+import {
+  makeCategoryDependencies,
+  CategoryDependencies,
+} from '@/features/category/dependencies';
 
 export type AppConfig = {
   sessionDurationHours?: number;
@@ -47,6 +51,7 @@ export type AppDependencies = {
   workspaces: WorkspacesDependencies;
   roadmaps: RoadmapDependencies;
   articles: ArticleDependencies;
+  categories: CategoryDependencies;
   shared: {
     passwordHasher: BcryptPasswordHasher;
     tokenService: ITokenService;
@@ -102,20 +107,24 @@ export function bootstrap(config: AppConfig = {}): AppDependencies {
   // 2. Articles (self-contained, no external deps)
   const articles = makeArticleDependencies();
 
-  // 3. Workspaces first (users need workspaceService)
-  const workspaces = makeWorkspacesDependencies();
+  // 3. Categories (self-contained)
+  const categories = makeCategoryDependencies();
 
-  // 4. Users (needs workspaceService, emailService, oauthProvider)
+  // 4. Users first (create without workspace service initially)
   const users = makeUsersDependencies({
     passwordHasher,
     tokenService,
     emailService,
     oauthProvider,
-    workspaceService: workspaces.workspaceService,
     frontendUrl,
   });
 
-  // 5. Roadmaps need article repository
+  // 5. Workspaces (needs userService for creating workspaces)
+  const workspaces = makeWorkspacesDependencies({
+    userService: users.userService,
+  });
+
+  // 6. Roadmaps need article repository
   const roadmaps = makeRoadmapDependencies({
     articleRepository: articles.articleRepository,
   });
@@ -125,6 +134,7 @@ export function bootstrap(config: AppConfig = {}): AppDependencies {
     workspaces,
     roadmaps,
     articles,
+    categories,
     shared: {
       passwordHasher,
       tokenService,

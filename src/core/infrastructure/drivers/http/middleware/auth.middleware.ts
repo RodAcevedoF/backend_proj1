@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ITokenService } from '@/core/domain/ports/ITokenService';
 
+import { Role } from '@/core/domain/Role';
+
 // Extend Express Request globally
 declare global {
   namespace Express {
@@ -8,6 +10,11 @@ declare global {
       user?: {
         userId: string;
         email: string;
+      };
+      /** Workspace context - populated by authorization middleware */
+      workspace?: {
+        workspaceId: string;
+        role: Role;
       };
       sessionId?: string;
     }

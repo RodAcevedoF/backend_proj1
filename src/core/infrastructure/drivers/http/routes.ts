@@ -4,6 +4,7 @@ import { createArticleRouter } from '@/features/article/infrastructure/adapters/
 import { createAuthRoutes } from '@/features/users/infrastructure/adapters/driver/http/auth.routes';
 import { createWorkspaceRoutes } from '@/features/workspaces/infrastructure/adapters/driver/http/workspace.routes';
 import { createRoadmapRoutes } from '@/features/roadmap/infrastructure/adapters/driver/http/roadmap.routes';
+import { createCategoryRoutes } from '@/features/category/infrastructure/adapters/driver/http/category.routes';
 import { LogoutController } from '@/features/users/infrastructure/adapters/driver/http/logout.controller';
 import { AuthMiddleware, AuthorizationMiddleware } from './middleware';
 
@@ -67,6 +68,16 @@ export function registerRoutes(app: Express) {
     `${BASE}/workspaces`,
     createWorkspaceRoutes({
       workspaceController: deps.workspaces.workspaceController,
+      authMiddleware,
+      authzMiddleware,
+    })
+  );
+
+  // Categories (nested under workspaces)
+  app.use(
+    `${BASE}/workspaces/:workspaceId/categories`,
+    createCategoryRoutes({
+      ctrl: deps.categories.categoryController,
       authMiddleware,
       authzMiddleware,
     })

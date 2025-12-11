@@ -12,8 +12,8 @@ export function createServer() {
    */
 
   loadMiddlewares(app);
+  loadCheckers(app);  // Health checks before auth routes
   registerRoutes(app);
-  loadCheckers(app);
 
   app.use((req, res) => {
     res.status(404).json({
