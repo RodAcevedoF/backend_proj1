@@ -26,6 +26,10 @@ import {
   makeCategoryDependencies,
   CategoryDependencies,
 } from '@/features/category/dependencies';
+import {
+  makeResourceDependencies,
+  ResourceDependencies,
+} from '@/features/resource/dependencies';
 
 export type AppConfig = {
   sessionDurationHours?: number;
@@ -52,6 +56,7 @@ export type AppDependencies = {
   roadmaps: RoadmapDependencies;
   articles: ArticleDependencies;
   categories: CategoryDependencies;
+  resources: ResourceDependencies;
   shared: {
     passwordHasher: BcryptPasswordHasher;
     tokenService: ITokenService;
@@ -129,12 +134,16 @@ export function bootstrap(config: AppConfig = {}): AppDependencies {
     articleRepository: articles.articleRepository,
   });
 
+  // 7. Resources (self-contained)
+  const resources = makeResourceDependencies();
+
   return {
     users,
     workspaces,
     roadmaps,
     articles,
     categories,
+    resources,
     shared: {
       passwordHasher,
       tokenService,

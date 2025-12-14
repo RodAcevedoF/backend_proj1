@@ -5,6 +5,7 @@ import { createAuthRoutes } from '@/features/users/infrastructure/adapters/drive
 import { createWorkspaceRoutes } from '@/features/workspaces/infrastructure/adapters/driver/http/workspace.routes';
 import { createRoadmapRoutes } from '@/features/roadmap/infrastructure/adapters/driver/http/roadmap.routes';
 import { createCategoryRoutes } from '@/features/category/infrastructure/adapters/driver/http/category.routes';
+import { createResourceRoutes } from '@/features/resource/infrastructure/adapters/driver/http/resource.routes';
 import { LogoutController } from '@/features/users/infrastructure/adapters/driver/http/logout.controller';
 import { AuthMiddleware, AuthorizationMiddleware } from './middleware';
 
@@ -88,6 +89,16 @@ export function registerRoutes(app: Express) {
     `${BASE}`,
     createRoadmapRoutes({
       roadmapController: deps.roadmaps.roadmapController,
+      authMiddleware,
+      authzMiddleware,
+    })
+  );
+
+  // Resources
+  app.use(
+    `${BASE}`,
+    createResourceRoutes({
+      resourceController: deps.resources.resourceController,
       authMiddleware,
       authzMiddleware,
     })
