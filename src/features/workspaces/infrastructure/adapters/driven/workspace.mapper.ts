@@ -7,6 +7,7 @@ interface WorkspaceDocument {
   _id: string;
   name: string;
   description?: string;
+  ownerId: string;
   members: Array<{
     userId: string;
     role: 'owner' | 'admin' | 'editor' | 'viewer';
@@ -58,11 +59,13 @@ export class WorkspaceMapper {
    */
   static toPersistence(workspace: Workspace): WorkspaceDocument {
     const primitives = workspace.toPrimitives();
+    const owner = primitives.members.find((m) => m.role === 'owner');
 
     return {
       _id: primitives.id,
       name: primitives.name,
       description: primitives.description,
+      ownerId: owner?.userId || primitives.members[0]?.userId || '',
       members: primitives.members,
       settings: primitives.settings,
       createdAt: primitives.createdAt,

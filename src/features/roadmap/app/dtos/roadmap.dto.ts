@@ -5,7 +5,8 @@ export interface CreateRoadmapDto {
   workspaceId: string;
   title: string;
   description: string;
-  sourceArticleIds?: string[];
+  categoryIds?: string[];
+  sourceResourceIds?: string[];
 }
 
 /**
@@ -13,7 +14,8 @@ export interface CreateRoadmapDto {
  */
 export interface GenerateAIRoadmapDto {
   workspaceId: string;
-  articleIds: string[];
+  resourceIds: string[];
+  categoryIds?: string[];
   targetAudience?: 'beginner' | 'intermediate' | 'advanced';
   focusAreas?: string[];
   estimatedWeeks?: number;
@@ -42,6 +44,7 @@ export interface AddStepDto {
  */
 export interface AddResourceDto {
   stepOrder: number;
+  resourceId?: string; // Optional reference to Resource entity
   title: string;
   type: 'video' | 'article' | 'book' | 'exercise' | 'course' | 'paper';
   url?: string;
@@ -68,12 +71,14 @@ export interface RoadmapResponseDto {
   workspaceId: string;
   title: string;
   description: string;
+  categoryIds: string[];
   steps: Array<{
     order: number;
     title: string;
     description: string;
     estimatedWeeks?: number;
     resources: Array<{
+      resourceId?: string;
       title: string;
       type: string;
       url?: string;
@@ -83,7 +88,7 @@ export interface RoadmapResponseDto {
     }>;
     prerequisites?: string[];
   }>;
-  sourceArticleIds: string[];
+  sourceResourceIds: string[];
   generatedBy: 'ai' | 'manual';
   createdBy: string;
   createdAt: string;

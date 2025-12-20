@@ -3,8 +3,12 @@ export interface ScientificArticleDTO {
   title: string;
   abstract: string;
   authors: string[];
-  publishedAt: string;
+  publishedAt?: string;
   source: string;
+  url?: string;
+  venue?: string;
+  citationCount?: number;
+  categories?: string[];
 }
 
 export interface SearchOptions {

@@ -17,7 +17,7 @@ export class MongoArticleRepository implements IArticleRepository {
   }
 
   async findById(id: string): Promise<Article | null> {
-    const doc = await ArticleModel.findById(id).exec();
+    const doc = await ArticleModel.findOne({ _id: id }).exec();
     if (!doc) return null;
     return new Article(toDomain(doc as any));
   }

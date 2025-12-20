@@ -1,5 +1,16 @@
+export interface ArticleEnrichmentInput {
+  title: string;
+  abstract: string;
+  authors?: string[];
+  venue?: string;
+}
+
+export interface ArticleEnrichmentResult {
+  summary: string;
+  keywords: string[];
+  categories: string[];
+}
+
 export interface IArticleEnrichmentLLM {
-  summarize(text: string): Promise<string>;
-  extractKeywords(text: string): Promise<string[]>;
-  classify(text: string): Promise<string[]>;
+  enrich(input: ArticleEnrichmentInput): Promise<ArticleEnrichmentResult>;
 }

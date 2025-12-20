@@ -14,7 +14,6 @@ export class EnrichArticleUseCase {
   ) {}
 
   async execute(input: EnrichArticleDTO): Promise<ArticleResponseDTO> {
-    // Get the raw external article
     const article = await this.repo.findById(input.articleId);
     if (!article) {
       throw new Error('Article not found');
@@ -24,21 +23,22 @@ export class EnrichArticleUseCase {
       throw new Error('Only external raw articles can be enriched');
     }
 
-    // Enrich with AI
-    const [summary, keywords, categories] = await Promise.all([
-      this.llm.summarize(article.content),
-      this.llm.extractKeywords(article.content),
-      this.llm.classify(article.content),
-    ]);
+    const primitives = article.toPrimitives();
+
+    // Enrich with AI using structured output
+    const enrichment = await this.llm.enrich({
+      title: primitives.title,
+      abstract: primitives.content,
+      authors: primitives.authors,
+    });
 
     // Update article with enriched data
-    const primitives = article.toPrimitives();
     const enrichedArticle = new Article({
       ...primitives,
       status: 'enriched',
-      summary,
-      tags: [...primitives.tags, ...keywords],
-      categories,
+      summary: enrichment.summary,
+      tags: [...new Set([...primitives.tags, ...enrichment.keywords])],
+      aiCategories: enrichment.categories,
       updatedAt: new Date(),
     });
 

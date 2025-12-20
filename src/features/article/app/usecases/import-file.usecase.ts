@@ -33,7 +33,7 @@ export class ImportFileUseCase {
 
     const articles: Article[] = [];
     const errors = [...parseResult.errors];
-    const enrichment = options?.enrich ?? false;
+    const shouldEnrich = options?.enrich ?? false;
 
     // Process rows
     for (let i = 0; i < parseResult.rows.length; i++) {
@@ -52,19 +52,20 @@ export class ImportFileUseCase {
 
       try {
         let summary: string | undefined;
-        let categories: string[] | undefined;
+        let aiCategories: string[] | undefined;
         let tags = row.tags ?? [];
 
         // Optional LLM enrichment
-        if (enrichment) {
-          const content = String(row.content);
-          [summary, categories, tags] = await Promise.all([
-            this.llm.summarize(content),
-            this.llm.classify(content),
-            this.llm.extractKeywords(content).then((kw) => [
-              ...new Set([...(row.tags ?? []), ...kw]),
-            ]),
-          ]);
+        if (shouldEnrich) {
+          const enrichment = await this.llm.enrich({
+            title: String(row.title),
+            abstract: String(row.content),
+            authors: row.authors,
+          });
+
+          summary = enrichment.summary;
+          aiCategories = enrichment.categories;
+          tags = [...new Set([...(row.tags ?? []), ...enrichment.keywords])];
         }
 
         const article = new Article({
@@ -74,10 +75,11 @@ export class ImportFileUseCase {
           title: String(row.title),
           content: String(row.content),
           tags,
-          status: enrichment ? 'enriched' : 'user_created',
+          categoryIds: [],
+          status: shouldEnrich ? 'enriched' : 'user_created',
           source: 'user',
           summary,
-          categories,
+          aiCategories,
           url: row.url ? String(row.url) : undefined,
           authors: row.authors,
           publishedAt: row.publishedAt ? new Date(row.publishedAt) : undefined,

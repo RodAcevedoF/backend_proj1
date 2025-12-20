@@ -34,8 +34,9 @@ const SettingsSchema = new Schema(
 const WorkspaceSchema = new Schema(
   {
     _id: { type: String, required: true }, // UUID from EntityId
-    name: { type: String, required: true, trim: true, index: true },
+    name: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
+    ownerId: { type: String, required: true, index: true }, // Denormalized for unique constraint
     members: { type: [MemberSchema], default: [] },
     settings: { type: SettingsSchema, default: () => ({}) },
   },
@@ -47,7 +48,8 @@ const WorkspaceSchema = new Schema(
 
 // Indexes
 WorkspaceSchema.index({ 'members.userId': 1 });
-WorkspaceSchema.index({ name: 1 });
+WorkspaceSchema.index({ ownerId: 1, name: 1 }, { unique: true }); // Unique name per owner
+WorkspaceSchema.index({ createdAt: -1 });
 
 // Prevent Mongoose from creating _id
 WorkspaceSchema.set('_id', false);

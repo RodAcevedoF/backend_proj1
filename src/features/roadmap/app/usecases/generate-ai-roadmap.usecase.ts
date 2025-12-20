@@ -1,7 +1,8 @@
 import { Result } from '../../../../core/domain/Result';
 import { IRoadmapRepository } from '../../domain/ports/outbound/iroadmap.repository';
 import { IAIRoadmapGenerator } from '../../domain/ports/outbound/ia-iroadmap-generator';
-import { IArticleRepository } from '../../../article/domain/ports/outbound/iarticle.repository';
+import { IResourceService } from '../../../resource/domain/ports/inbound/iresource.service';
+import { ResourceResponseDTO } from '../../../resource/app/dtos/resource.dto';
 import { Roadmap } from '../../domain/Roadmap';
 import { GenerateAIRoadmapDto, RoadmapResponseDto } from '../dtos/roadmap.dto';
 
@@ -13,7 +14,7 @@ export class GenerateAIRoadmapUseCase {
   constructor(
     private readonly roadmapRepository: IRoadmapRepository,
     private readonly aiGenerator: IAIRoadmapGenerator,
-    private readonly articleRepository: IArticleRepository
+    private readonly resourceService: IResourceService
   ) {}
 
   async execute(
@@ -21,29 +22,24 @@ export class GenerateAIRoadmapUseCase {
     userId: string
   ): Promise<Result<RoadmapResponseDto>> {
     try {
-      // Fetch articles
-      const articles = await Promise.all(
-        dto.articleIds.map((id) => this.articleRepository.findById(id))
-      );
+      // Fetch resources
+      const resources = await this.resourceService.getByIds({ ids: dto.resourceIds });
 
-      // Filter out null results
-      const validArticles = articles.filter((a) => a !== null);
-
-      if (validArticles.length === 0) {
-        return Result.fail('No valid articles found');
+      if (resources.length === 0) {
+        return Result.fail('No valid resources found');
       }
 
-      // Prepare article data for AI
-      const articleData = validArticles.map((article) => ({
-        id: article!.id.toString(),
-        title: article!.title,
-        abstract: article!.content, // Using content as abstract
-        content: article!.content,
+      // Prepare resource data for AI
+      const resourceData = resources.map((resource) => ({
+        id: resource.id,
+        title: resource.title,
+        abstract: resource.description || '',
+        content: this.getResourceContent(resource),
       }));
 
       // Generate roadmap using AI
       const aiRoadmap = await this.aiGenerator.generateRoadmap({
-        articles: articleData,
+        articles: resourceData,
         targetAudience: dto.targetAudience,
         focusAreas: dto.focusAreas,
         estimatedWeeks: dto.estimatedWeeks,
@@ -54,9 +50,10 @@ export class GenerateAIRoadmapUseCase {
         workspaceId: dto.workspaceId,
         title: aiRoadmap.title,
         description: aiRoadmap.description,
+        categoryIds: dto.categoryIds || [],
         steps: aiRoadmap.steps,
         progress: [],
-        sourceArticleIds: dto.articleIds,
+        sourceResourceIds: dto.resourceIds,
         generatedBy: 'ai',
         createdBy: userId,
         isPublished: false,
@@ -74,6 +71,14 @@ export class GenerateAIRoadmapUseCase {
     }
   }
 
+  private getResourceContent(resource: ResourceResponseDTO): string {
+    if (resource.type === 'article' || resource.type === 'paper') {
+      const metadata = resource.metadata as { content?: string; abstract?: string };
+      return metadata.content || metadata.abstract || resource.description || '';
+    }
+    return resource.description || '';
+  }
+
   private mapToDto(roadmap: Roadmap): RoadmapResponseDto {
     const primitives = roadmap.toPrimitives();
     return {
@@ -81,8 +86,9 @@ export class GenerateAIRoadmapUseCase {
       workspaceId: primitives.workspaceId,
       title: primitives.title,
       description: primitives.description,
+      categoryIds: primitives.categoryIds,
       steps: primitives.steps,
-      sourceArticleIds: primitives.sourceArticleIds,
+      sourceResourceIds: primitives.sourceResourceIds,
       generatedBy: primitives.generatedBy,
       createdBy: primitives.createdBy,
       createdAt: primitives.createdAt,

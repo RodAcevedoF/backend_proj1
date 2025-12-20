@@ -10,7 +10,7 @@ import { Workspace } from '@/features/workspaces/domain/workspace';
  */
 export class MongoWorkspaceRepository implements IWorkspaceRepository {
   async findById(id: EntityId): Promise<Workspace | null> {
-    const doc = await WorkspaceModel.findById(id.toString()).lean();
+    const doc = await WorkspaceModel.findOne({ _id: id.toString() }).lean();
     if (!doc) return null;
     return WorkspaceMapper.toDomain(doc as any);
   }
@@ -38,9 +38,8 @@ export class MongoWorkspaceRepository implements IWorkspaceRepository {
   async save(workspace: Workspace): Promise<void> {
     const doc = WorkspaceMapper.toPersistence(workspace);
 
-    await WorkspaceModel.findByIdAndUpdate(doc._id, doc, {
+    await WorkspaceModel.updateOne({ _id: doc._id }, doc, {
       upsert: true,
-      new: true,
     });
 
     // TODO: Publish domain events
@@ -50,13 +49,21 @@ export class MongoWorkspaceRepository implements IWorkspaceRepository {
   }
 
   async delete(id: EntityId): Promise<void> {
-    await WorkspaceModel.findByIdAndDelete(id.toString());
+    await WorkspaceModel.deleteOne({ _id: id.toString() });
   }
 
   async isMember(workspaceId: EntityId, userId: EntityId): Promise<boolean> {
     const count = await WorkspaceModel.countDocuments({
       _id: workspaceId.toString(),
       'members.userId': userId.toString(),
+    });
+    return count > 0;
+  }
+
+  async existsByNameAndOwner(name: string, ownerId: EntityId): Promise<boolean> {
+    const count = await WorkspaceModel.countDocuments({
+      ownerId: ownerId.toString(),
+      name: { $regex: `^${name}$`, $options: 'i' }, // Case-insensitive
     });
     return count > 0;
   }

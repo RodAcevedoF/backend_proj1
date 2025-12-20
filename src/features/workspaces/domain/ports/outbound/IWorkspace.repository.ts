@@ -37,4 +37,9 @@ export interface IWorkspaceRepository {
    * Check if user is a member of workspace
    */
   isMember(workspaceId: EntityId, userId: EntityId): Promise<boolean>;
+
+  /**
+   * Check if workspace name exists for owner
+   */
+  existsByNameAndOwner(name: string, ownerId: EntityId): Promise<boolean>;
 }

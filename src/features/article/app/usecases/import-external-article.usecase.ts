@@ -15,9 +15,12 @@ export class ImportExternalArticleUsecase {
   async execute(input: ImportExternalArticleDTO): Promise<Article> {
     const externalArticle = await this.provider.getById(input.externalId);
 
-    const summary = await this.llm.summarize(externalArticle.abstract);
-    const keywords = await this.llm.extractKeywords(externalArticle.abstract);
-    const classifications = await this.llm.classify(externalArticle.abstract);
+    const enrichment = await this.llm.enrich({
+      title: externalArticle.title,
+      abstract: externalArticle.abstract,
+      authors: externalArticle.authors,
+      venue: externalArticle.venue,
+    });
 
     const article = new Article({
       id: randomUUID(),
@@ -25,15 +28,16 @@ export class ImportExternalArticleUsecase {
       userId: input.userId,
       title: externalArticle.title,
       content: externalArticle.abstract,
-      tags: [...keywords],
+      tags: enrichment.keywords,
+      categoryIds: [],
       status: 'enriched',
       source: 'semantic-scholar',
       externalId: externalArticle.id,
-      summary,
-      categories: [...classifications],
-      url: `https://www.semanticscholar.org/paper/${externalArticle.id}`,
+      summary: enrichment.summary,
+      aiCategories: enrichment.categories,
+      url: externalArticle.url || `https://www.semanticscholar.org/paper/${externalArticle.id}`,
       authors: externalArticle.authors,
-      publishedAt: new Date(externalArticle.publishedAt),
+      publishedAt: externalArticle.publishedAt ? new Date(externalArticle.publishedAt) : undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     });

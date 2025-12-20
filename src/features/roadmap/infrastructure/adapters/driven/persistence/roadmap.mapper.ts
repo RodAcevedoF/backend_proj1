@@ -21,6 +21,7 @@ export class RoadmapMapper {
         estimatedWeeks: stepData.estimatedWeeks,
         resources: (stepData.resources || []).map((resData: any) =>
           LearningResource.create({
+            resourceId: resData.resourceId,
             title: resData.title,
             type: resData.type,
             url: resData.url,
@@ -50,9 +51,10 @@ export class RoadmapMapper {
       workspaceId: raw.workspaceId,
       title: raw.title,
       description: raw.description,
+      categoryIds: raw.categoryIds || [],
       steps,
       progress,
-      sourceArticleIds: raw.sourceArticleIds || [],
+      sourceResourceIds: raw.sourceResourceIds || [],
       generatedBy: raw.generatedBy,
       createdBy: raw.createdBy,
       createdAt: new Date(raw.createdAt),
@@ -72,6 +74,7 @@ export class RoadmapMapper {
       workspaceId: primitives.workspaceId,
       title: primitives.title,
       description: primitives.description,
+      categoryIds: primitives.categoryIds,
       steps: primitives.steps,
       progress: primitives.progress.map((p) => ({
         userId: p.userId,
@@ -80,7 +83,7 @@ export class RoadmapMapper {
         completedResources: p.completedResources,
         notes: p.notes,
       })),
-      sourceArticleIds: primitives.sourceArticleIds,
+      sourceResourceIds: primitives.sourceResourceIds,
       generatedBy: primitives.generatedBy,
       createdBy: primitives.createdBy,
       isPublished: primitives.isPublished,

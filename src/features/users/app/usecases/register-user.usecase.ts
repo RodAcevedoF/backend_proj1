@@ -15,7 +15,7 @@ import { Email, Result } from '@/core/domain';
 export class RegisterUserUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly workspaceService: IWorkspaceService,
+    private readonly workspaceService: IWorkspaceService | undefined,
     private readonly passwordHasher: IPasswordHasher,
     private readonly emailService: IEmailService,
     private readonly frontendUrl: string
@@ -64,7 +64,7 @@ export class RegisterUserUseCase {
     }
 
     // Create initial workspace if name provided (via workspace service)
-    if (dto.workspaceName) {
+    if (dto.workspaceName && this.workspaceService) {
       const workspaceResult = await this.workspaceService.createWorkspace(
         dto.workspaceName,
         user.id.toString()

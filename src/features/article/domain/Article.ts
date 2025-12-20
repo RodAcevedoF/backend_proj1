@@ -8,6 +8,7 @@ export interface ArticleProps {
   title: string;
   content: string;
   tags: string[];
+  categoryIds: string[]; // User-defined categories (references Category entity)
 
   // Metadata
   status: ArticleStatus;
@@ -16,7 +17,7 @@ export interface ArticleProps {
 
   // AI-enriched fields (only populated when status is 'enriched')
   summary?: string;
-  categories?: string[];
+  aiCategories?: string[]; // AI-generated categories (free text)
 
   // External article metadata
   url?: string;
@@ -52,6 +53,10 @@ export class Article {
 
   get tags() {
     return this.props.tags;
+  }
+
+  get categoryIds() {
+    return this.props.categoryIds;
   }
 
   get status() {

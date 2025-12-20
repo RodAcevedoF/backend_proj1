@@ -1,8 +1,10 @@
 /**
  * Learning Resource Value Object
  * Represents a study material (video, article, exercise, etc.)
+ * Can optionally reference a stored Resource entity via resourceId
  */
 export interface LearningResourceProps {
+  resourceId?: string; // Optional reference to Resource entity
   title: string;
   type: 'video' | 'article' | 'book' | 'exercise' | 'course' | 'paper';
   url?: string;
@@ -49,6 +51,10 @@ export class LearningResource {
     return new LearningResource(props);
   }
 
+  get resourceId(): string | undefined {
+    return this.props.resourceId;
+  }
+
   get title(): string {
     return this.props.title;
   }
@@ -75,6 +81,7 @@ export class LearningResource {
 
   toJSON() {
     return {
+      resourceId: this.props.resourceId,
       title: this.props.title,
       type: this.props.type,
       url: this.props.url,
@@ -82,6 +89,10 @@ export class LearningResource {
       estimatedDuration: this.props.estimatedDuration,
       difficulty: this.props.difficulty,
     };
+  }
+
+  hasLinkedResource(): boolean {
+    return !!this.props.resourceId;
   }
 
   equals(other: LearningResource): boolean {

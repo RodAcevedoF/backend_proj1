@@ -1,4 +1,4 @@
-import { IArticleRepository } from '@/features/article/domain/ports/outbound/iarticle.repository';
+import { IResourceService } from '@/features/resource/domain/ports/inbound/iresource.service';
 import { MongoRoadmapRepository } from '@/features/roadmap/infrastructure/adapters/driven/persistence/mongo-roadmap.repository';
 import { LangChainRoadmapGenerator } from '@/features/roadmap/infrastructure/adapters/driven/llm/langchain-roadmap-generator';
 import { CreateRoadmapUseCase } from '@/features/roadmap/app/usecases/create-roadmap.usecase';
@@ -19,7 +19,7 @@ export type RoadmapDependencies = {
 };
 
 export type RoadmapExternalDeps = {
-  articleRepository: IArticleRepository;
+  resourceService: IResourceService;
 };
 
 export function makeRoadmapDependencies(
@@ -32,7 +32,7 @@ export function makeRoadmapDependencies(
   const generateAIRoadmapUseCase = new GenerateAIRoadmapUseCase(
     roadmapRepository,
     aiGenerator,
-    external.articleRepository
+    external.resourceService
   );
   const getRoadmapUseCase = new GetRoadmapUseCase(roadmapRepository);
   const updateProgressUseCase = new UpdateProgressUseCase(roadmapRepository);

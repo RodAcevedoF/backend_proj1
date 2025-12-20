@@ -9,7 +9,7 @@ export class ArticleController {
   /**
    * GET /articles
    * Public paginated list - can filter by workspace, status, etc.
-   */
+   */  
   getAll = async (req: Request, res: Response) => {
     try {
       const filters: FindArticlesDTO = {

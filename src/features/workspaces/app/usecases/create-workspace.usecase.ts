@@ -24,6 +24,15 @@ export class CreateWorkspaceUseCase {
       return Result.fail('User not found');
     }
 
+    // Check for duplicate workspace name for this owner
+    const nameExists = await this.workspaceRepository.existsByNameAndOwner(
+      dto.name,
+      userId
+    );
+    if (nameExists) {
+      return Result.fail('You already have a workspace with this name');
+    }
+
     // Create workspace
     const workspace = Workspace.create(dto.name, userId, dto.description);
 

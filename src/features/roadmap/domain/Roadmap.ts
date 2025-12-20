@@ -12,9 +12,10 @@ export interface RoadmapProps {
   workspaceId: string;
   title: string;
   description: string;
+  categoryIds: string[]; // User-defined categories
   steps: RoadmapStep[];
   progress: Progress[];
-  sourceArticleIds: string[]; // Articles used to generate the roadmap
+  sourceResourceIds: string[]; // Resources used to generate the roadmap
   generatedBy: 'ai' | 'manual';
   createdBy: string; // User ID
   createdAt: Date;
@@ -86,8 +87,12 @@ export class Roadmap extends AggregateRoot {
     return [...this.props.progress];
   }
 
-  get sourceArticleIds(): string[] {
-    return [...this.props.sourceArticleIds];
+  get sourceResourceIds(): string[] {
+    return [...this.props.sourceResourceIds];
+  }
+
+  get categoryIds(): string[] {
+    return [...this.props.categoryIds];
   }
 
   get generatedBy(): 'ai' | 'manual' {
@@ -260,9 +265,10 @@ export class Roadmap extends AggregateRoot {
       workspaceId: this.props.workspaceId,
       title: this.props.title,
       description: this.props.description,
+      categoryIds: this.props.categoryIds,
       steps: this.props.steps.map((s) => s.toJSON()),
       progress: this.props.progress.map((p) => p.toJSON()),
-      sourceArticleIds: this.props.sourceArticleIds,
+      sourceResourceIds: this.props.sourceResourceIds,
       generatedBy: this.props.generatedBy,
       createdBy: this.props.createdBy,
       createdAt: this.props.createdAt.toISOString(),

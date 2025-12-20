@@ -11,7 +11,7 @@ import { UserMapper } from './user.mapper';
  */
 export class MongoUserRepository implements IUserRepository {
   async findById(id: EntityId): Promise<User | null> {
-    const doc = await UserModel.findById(id.toString()).lean();
+    const doc = await UserModel.findOne({ _id: id.toString() }).lean();
     if (!doc) return null;
     return UserMapper.toDomain(
       doc as Parameters<typeof UserMapper.toDomain>[0]
@@ -69,9 +69,8 @@ export class MongoUserRepository implements IUserRepository {
   async save(user: User): Promise<void> {
     const doc = UserMapper.toPersistence(user);
 
-    await UserModel.findByIdAndUpdate(doc._id, doc, {
+    await UserModel.updateOne({ _id: doc._id }, doc, {
       upsert: true,
-      new: true,
     });
 
     // TODO: Publish domain events
@@ -81,7 +80,7 @@ export class MongoUserRepository implements IUserRepository {
   }
 
   async delete(id: EntityId): Promise<void> {
-    await UserModel.findByIdAndDelete(id.toString());
+    await UserModel.deleteOne({ _id: id.toString() });
   }
 
   async existsByEmail(email: Email): Promise<boolean> {

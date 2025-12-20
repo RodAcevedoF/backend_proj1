@@ -8,6 +8,7 @@ const ArticleSchema = new Schema(
     title: { type: String, required: true },
     content: { type: String, required: true },
     tags: { type: [String], default: [] },
+    categoryIds: { type: [String], default: [], index: true }, // References Category
 
     // Metadata
     status: {
@@ -25,7 +26,7 @@ const ArticleSchema = new Schema(
 
     // AI-enriched fields
     summary: { type: String, required: false },
-    categories: { type: [String], default: [] },
+    aiCategories: { type: [String], default: [] },
 
     // External article metadata
     url: { type: String, required: false },
@@ -37,6 +38,13 @@ const ArticleSchema = new Schema(
     versionKey: false,
   }
 );
+
+// Indexes
+ArticleSchema.index({ workspaceId: 1, status: 1 });
+ArticleSchema.index({ workspaceId: 1, createdAt: -1 });
+ArticleSchema.index({ userId: 1 });
+ArticleSchema.index({ source: 1, externalId: 1 }, { sparse: true });
+ArticleSchema.index({ title: 'text', content: 'text' }); // Text search
 
 // Tipo del documento (opcional, para tipar internamente)
 export type ArticleDocument = InferSchemaType<typeof ArticleSchema>;

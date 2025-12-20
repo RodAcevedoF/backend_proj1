@@ -11,11 +11,11 @@ export class RoadmapController {
   async createRoadmap(req: Request, res: Response): Promise<Response> {
     try {
       const { workspaceId } = req.params;
-      const { title, description, sourceArticleIds } = req.body;
+      const { title, description, sourceResourceIds } = req.body;
       const userId = req.user!.userId;
 
       const result = await this.roadmapService.create(
-        { workspaceId, title, description, sourceArticleIds },
+        { workspaceId, title, description, sourceResourceIds },
         userId
       );
 
@@ -42,12 +42,12 @@ export class RoadmapController {
   async generateAIRoadmap(req: Request, res: Response): Promise<Response> {
     try {
       const { workspaceId } = req.params;
-      const { articleIds, targetAudience, focusAreas, estimatedWeeks } =
+      const { resourceIds, targetAudience, focusAreas, estimatedWeeks } =
         req.body;
       const userId = req.user!.userId;
 
       const result = await this.roadmapService.generateAI(
-        { workspaceId, articleIds, targetAudience, focusAreas, estimatedWeeks },
+        { workspaceId, resourceIds, targetAudience, focusAreas, estimatedWeeks },
         userId
       );
 

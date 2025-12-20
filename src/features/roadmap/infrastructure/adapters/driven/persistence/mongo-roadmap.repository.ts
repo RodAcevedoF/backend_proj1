@@ -11,14 +11,13 @@ export class MongoRoadmapRepository implements IRoadmapRepository {
   async save(roadmap: Roadmap): Promise<void> {
     const persistence = RoadmapMapper.toPersistence(roadmap);
 
-    await RoadmapModel.findByIdAndUpdate(persistence._id, persistence, {
+    await RoadmapModel.updateOne({ _id: persistence._id }, persistence, {
       upsert: true,
-      new: true,
     });
   }
 
   async findById(id: string): Promise<Roadmap | null> {
-    const doc = await RoadmapModel.findById(id);
+    const doc = await RoadmapModel.findOne({ _id: id });
 
     if (!doc) {
       return null;
@@ -53,7 +52,7 @@ export class MongoRoadmapRepository implements IRoadmapRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await RoadmapModel.findByIdAndDelete(id);
+    await RoadmapModel.deleteOne({ _id: id });
   }
 
   async exists(id: string): Promise<boolean> {

@@ -9,6 +9,7 @@ const roadmapSchema = new Schema(
     workspaceId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
+    categoryIds: { type: [String], default: [], index: true },
     steps: [
       {
         order: { type: Number, required: true },
@@ -17,6 +18,7 @@ const roadmapSchema = new Schema(
         estimatedWeeks: { type: Number },
         resources: [
           {
+            resourceId: { type: String, index: true }, // Optional reference to Resource entity
             title: { type: String, required: true },
             type: {
               type: String,
@@ -44,7 +46,7 @@ const roadmapSchema = new Schema(
         notes: { type: String },
       },
     ],
-    sourceArticleIds: [{ type: String }],
+    sourceResourceIds: [{ type: String }],
     generatedBy: { type: String, enum: ['ai', 'manual'], required: true },
     createdBy: { type: String, required: true, index: true },
     isPublished: { type: Boolean, default: false, index: true },
@@ -57,7 +59,9 @@ const roadmapSchema = new Schema(
 
 // Indexes
 roadmapSchema.index({ workspaceId: 1, isPublished: 1 });
+roadmapSchema.index({ workspaceId: 1, createdAt: -1 });
 roadmapSchema.index({ createdBy: 1 });
 roadmapSchema.index({ 'progress.userId': 1 });
+roadmapSchema.index({ title: 'text', description: 'text' }); // Text search
 
 export const RoadmapModel = model('Roadmap', roadmapSchema);

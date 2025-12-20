@@ -9,7 +9,7 @@ import { ImportFileUseCase } from './app/usecases/import-file.usecase';
 import { SearchExternalArticlesUseCase } from './app/usecases/search-external-articles.usecase';
 import { UpdateArticleUseCase } from './app/usecases/update-article.usecase';
 import { SpreadsheetParser } from './infrastructure/adapters/driven/parsers/spreadsheet-parser';
-import { LangChainArticleEnrichment } from './infrastructure/adapters/driven/providers/lanchain-article-enrichment';
+import { LangChainArticleEnrichment } from './infrastructure/adapters/driven/providers/langchain-article-enrichment';
 import { SemanticScholarProvider } from './infrastructure/adapters/driven/providers/semantic-scholar-provider';
 import { MongoArticleRepository } from './infrastructure/adapters/driven/repositories/mongo.repository';
 import { ArticleServiceAdapter } from './infrastructure/adapters/driver/article-adapter.service';

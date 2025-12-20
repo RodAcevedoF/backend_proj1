@@ -68,6 +68,9 @@ const UserSchema = new Schema(
 // Indexes
 UserSchema.index({ 'workspaces.workspaceId': 1 });
 UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ emailVerificationToken: 1 }, { sparse: true });
+UserSchema.index({ passwordResetToken: 1 }, { sparse: true });
+UserSchema.index({ createdAt: -1 });
 
 // Prevent Mongoose from creating _id
 UserSchema.set('_id', false);

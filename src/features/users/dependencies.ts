@@ -31,7 +31,7 @@ export type UsersExternalDeps = {
   tokenService: ITokenService;
   emailService: IEmailService;
   oauthProvider: IOAuthProvider;
-  workspaceService: IWorkspaceService;
+  workspaceService?: IWorkspaceService;
   frontendUrl: string;
 };
 

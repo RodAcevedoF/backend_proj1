@@ -17,11 +17,12 @@ export class BulkInsertArticlesUseCase {
           title: articleData.title,
           content: articleData.content,
           tags: articleData.tags ?? [],
+          categoryIds: articleData.categoryIds ?? [],
           status: articleData.status ?? 'user_created',
           source: articleData.source ?? 'user',
           externalId: articleData.externalId,
           summary: articleData.summary,
-          categories: articleData.categories,
+          aiCategories: articleData.aiCategories,
           url: articleData.url,
           authors: articleData.authors,
           publishedAt: articleData.publishedAt

@@ -8,6 +8,7 @@ export interface ArticleResponseDTO {
   title: string;
   content: string;
   tags: string[];
+  categoryIds: string[]; // User-defined category references
 
   // Metadata
   status: ArticleStatus;
@@ -16,7 +17,7 @@ export interface ArticleResponseDTO {
 
   // AI-enriched fields
   summary?: string;
-  categories?: string[];
+  aiCategories?: string[];
 
   // External article metadata
   url?: string;
